@@ -90,6 +90,13 @@
   .foot{margin:30px 0;padding-top:16px;border-top:1px solid var(--line);font-family:"IBM Plex Mono";font-size:11px;color:var(--ink-faint);text-align:center}
   .note{display:flex;gap:10px;align-items:flex-start;background:#EAF7F9;border:1px solid #B6E4EB;border-radius:11px;padding:12px 14px;font-size:13px;color:#0a5560;margin-top:6px}
   .note svg{width:18px;height:18px;color:var(--cyan-deep);flex-shrink:0;margin-top:2px}
+  .tb-links{display:flex;gap:14px;align-items:center}
+  .tb-links a{color:#9FB6CE;font-size:12px;text-decoration:none}.tb-links a:hover{color:#fff}
+  @media (max-width:620px){
+    .topbar-in{gap:10px}.tb-right{width:100%;margin-left:0}.roombox{flex:1}.roombox input{width:100%}
+    .tabs{flex-direction:column}.tab{text-align:center}
+    .uc{flex-wrap:wrap}.total .n{font-size:38px}
+  }
 </style>
 </head>
 <body>
@@ -159,7 +166,8 @@
     </div>
   </section>
 
-  <div class="foot">HMF Design Clinic · Solution Grader · Cedarline Health Group is fictional</div>
+  <div class="foot">HMF Design Clinic · Solution Grader · Cedarline Health Group is fictional<br>
+    <a href="index.html">Interactive activity</a> · <a href="proctor.html">Proctor console</a> · <a href="playbook.html">Playbook</a></div>
 </div>
 
 <div class="modal" id="modal"><div class="modal-in"><div class="modal-h"><h3 id="mTitle">Submission</h3><button class="x" id="mClose" type="button">&times;</button></div><div class="modal-b" id="mBody"></div></div></div>
@@ -235,9 +243,14 @@ function HMF_START(){
     dropEl.addEventListener("drop",function(e){e.preventDefault();dropEl.classList.remove("over");if(e.dataTransfer.files[0])handle(e.dataTransfer.files[0]);});
     inputEl.addEventListener("change",function(){if(inputEl.files[0])handle(inputEl.files[0]);});
     function handle(file){
+      if(file.size>20*1024*1024){ statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--red)">file too large (max 20 MB) — try a smaller file or paste the text</span></div>'; return; }
       statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st">extracting…</span></div>';
-      extractText(file).then(function(text){ onText(text||""); statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--green)">✓ '+(text||"").length+' chars extracted</span></div>'; })
-        .catch(function(err){ statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--red)">'+esc(err.message)+'</span></div>'; });
+      extractText(file).then(function(text){
+        text=(text||"").trim();
+        if(!text){ statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--amber)">no text found (scanned/image PDF?) — paste your answers below</span></div>'; return; }
+        onText(text);
+        statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--green)">✓ '+text.length.toLocaleString()+' characters extracted — review below</span></div>';
+      }).catch(function(err){ statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--red)">'+esc(err.message)+'</span></div>'; });
     }
   }
   wireDrop($("#drop"),$("#fileInput"),function(t){$("#submissionText").value=t;},$("#fileStatus"));
@@ -283,7 +296,17 @@ function HMF_START(){
     var html='<div class="total"><div class="n">'+rec.total+' <span style="font-size:20px;color:#9FB6CE">/ '+(rec.totalMax||TOTAL_MAX)+'</span></div><div class="l">'+esc(rec.teamName)+' · total across '+ (rec.perUseCase?rec.perUseCase.length:USECASES.length) +' use cases</div></div>';
     (rec.perUseCase||[]).forEach(function(u){ var pct=Math.round((u.score/100)*100); html+='<div class="uc"><div class="nm"><b>'+esc(u.title)+'</b><div class="bar"><i style="width:'+pct+'%"></i></div>'+(u.note?'<p>'+esc(u.note)+'</p>':'')+'</div><div class="sc">'+u.score+'<span style="font-size:12px;color:var(--ink-faint)">/100</span></div></div>'; });
     if(rec.rationale) html+='<div class="rationale"><b>Overall.</b> '+esc(rec.rationale)+'</div>';
+    html+='<div class="row"><button class="btn ghost sm" id="btnDownload" type="button">⭳ Download result</button></div>';
     host.innerHTML=html;
+    var dl=$("#btnDownload"); if(dl) dl.addEventListener("click",function(){ downloadResult(rec); });
+  }
+  function downloadResult(rec){
+    var lines=["HMF Design Clinic — Solution Grader","Team: "+rec.teamName,"Event: "+ROOM,"","TOTAL: "+rec.total+" / "+(rec.totalMax||TOTAL_MAX),""];
+    (rec.perUseCase||[]).forEach(function(u){ lines.push(u.title+": "+u.score+"/100"); if(u.note) lines.push("  "+u.note); });
+    if(rec.rationale){ lines.push(""); lines.push("Overall: "+rec.rationale); }
+    var blob=new Blob([lines.join("\n")],{type:"text/plain"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="hmf-result-"+slug(rec.teamName)+".txt"; a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
   }
 
   /* ---- proctor: team list ---- */
