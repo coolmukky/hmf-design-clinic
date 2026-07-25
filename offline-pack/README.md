@@ -1,18 +1,18 @@
-# Offline pack — paper backup for the HMF Design Clinic
+# Offline pack — updated with all 27 customer pain points
 
-Run the clinic without the website if you need to. Print and hand out:
+Built from the aligned use-case content (HMF_Design_Exercise). Word (.docx) and
+print-ready PDF (in `pdf/`) versions of every document.
 
-- **HMF-Team-Workbook.docx** — give one to every team. A single fill-in workbook:
-  cover + team details, the customer scenario, then all four use cases
-  (AI Security, Cloud Edge, DC Edge Perimeter Firewall, Macro & Micro
-  Segmentation) with clear answer boxes for a product/platform and an SE
-  response per concern, tips, and a final scoreboard (400 points total).
-- **HMF-Activity-Guide.docx** — optional one-page overview of the task and scoring.
-- **HMF-Proctor-Guide.docx** — proctor only. Reference answers for every use
-  case and the 0–100 scoring bands.
+- **HMF-Team-Workbook** — one per team. Cover + details, scenario, and all four
+  use cases with **every customer pain point** (AI Security 7 · Cloud Edge 6 ·
+  DC Edge 5 · Segmentation 9 = 27), each with product + SE-response answer boxes,
+  tips, and a scoreboard (400 total). Teams answer the pain points the proctor assigns.
+- **HMF-Proctor-Guide** — proctor. Every pain point with the reference product,
+  model SE response, how-it-helps, and upsell, plus the 0–100 scoring bands.
+- **HMF-Proctor-Cheat-Sheet** — proctor. Landscape at-a-glance: all 27 pain points
+  with their products.
+- **HMF-Proctor-Scoring-Sheet** — proctor. Landscape: teams × four use cases, totals /400.
+- **HMF-Activity-Guide** — optional overview.
 
-- **HMF-Proctor-Scoring-Sheet.docx** — proctor only. One landscape page: all
-  teams × four use cases grid to tally scores and totals (out of 400), with the
-  scoring bands printed at the foot.
-
-These mirror the live activity at the site root (index.html / proctor.html).
+These mirror the live activity at the site root (index.html / proctor.html),
+which reads the same content from hmf-data.js.
