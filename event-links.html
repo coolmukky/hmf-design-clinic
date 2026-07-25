@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMF Design Clinic — Event Links</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{--paper:#F3F6FA;--surface:#fff;--ink:#0E1A2B;--ink-soft:#46566E;--ink-faint:#7E8CA1;--line:#CBD5E3;--line-soft:#E1E8F1;--navy:#0D274D;--cyan:#00BCEB;--cyan-deep:#036C8F;--amber:#E2891F;--green:#27A276;--green-soft:#D7F0E6;--radius:14px;--shadow:0 1px 0 rgba(14,26,43,.04),0 18px 40px -28px rgba(14,26,43,.55)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:"Chakra Petch",sans-serif;margin:0;line-height:1.12;letter-spacing:-.01em}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  a{color:var(--cyan-deep)}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  .eyebrow{font-family:"IBM Plex Mono";font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:#7FE2EF}
+  .topbar{background:linear-gradient(180deg,#0c1d34,#0a1830);border-bottom:2px solid var(--cyan);color:#EAF1F8}
+  .topbar-in{max-width:920px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;line-height:1.15}
+  .brand b{font-family:"Chakra Petch";font-size:16px;color:#fff}
+  .brand small{font-family:"IBM Plex Mono";font-size:10px;letter-spacing:.12em;color:#7FE2EF;text-transform:uppercase}
+  .hero{background:linear-gradient(160deg,var(--navy),#041E42);color:#EAF1F8;padding:30px 0 26px}
+  .hero .wrap{display:flex;flex-direction:column;gap:6px}
+  .hero h1{font-size:28px;color:#fff}
+  .hero p{margin:0;color:#9FB6CE;font-size:14px;max-width:640px}
+  .codebar{background:#fff;border-bottom:1px solid var(--line)}
+  .codebar-in{max-width:920px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .codebar label{font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-deep);font-weight:600}
+  .codebar input{font-family:"IBM Plex Mono";font-size:22px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);background:#FBFDFF;border:2px solid var(--cyan);border-radius:10px;padding:8px 16px;width:220px;outline:none}
+  .codebar input:focus{box-shadow:0 0 0 4px rgba(0,188,235,.18)}
+  .codebar .hint{font-size:12.5px;color:var(--ink-faint)}
+  main{padding:26px 0 60px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+  .card.team{border-left:5px solid var(--cyan)}
+  .card.proctor{border-left:5px solid var(--amber)}
+  .card h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--navy);margin-bottom:2px;display:flex;align-items:center;gap:9px}
+  .card h2 .tag{font-family:"IBM Plex Mono";font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 9px;border-radius:20px}
+  .tag.forteam{background:#E4F6FB;color:var(--cyan-deep);border:1px solid #B7E6F3}
+  .tag.foryou{background:#FBEBD3;color:#8a560f;border:1px solid #F0CE97}
+  .card .sub{color:var(--ink-soft);font-size:13.5px;margin:2px 0 16px}
+  .linkrow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .linkbox{flex:1;min-width:280px;display:flex;align-items:center;background:#F7F9FC;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .linkbox .u{flex:1;font-family:"IBM Plex Mono";font-size:13px;color:var(--navy);padding:12px 14px;overflow-x:auto;white-space:nowrap}
+  .copy{font-family:"IBM Plex Sans";font-weight:600;font-size:13px;border:none;border-left:1px solid var(--line);background:var(--navy);color:#fff;padding:0 18px;cursor:pointer;white-space:nowrap}
+  .copy:hover{background:#12315e}
+  .copy.done{background:var(--green)}
+  .qrpair{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px}
+  .qr{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;width:190px}
+  .qr .box{width:160px;height:160px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+  .qr .box img,.qr .box canvas{width:160px!important;height:160px!important}
+  .qr .cap{font-family:"IBM Plex Mono";font-size:11px;color:var(--ink-soft);letter-spacing:.04em}
+  .qr .cap b{color:var(--navy)}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:6px 0 0}
+  .steps li{counter-increment:s;position:relative;padding:9px 0 9px 40px;border-bottom:1px dashed var(--line-soft);font-size:14px;color:var(--ink-soft)}
+  .steps li:last-child{border-bottom:none}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-family:"Chakra Petch";font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .steps li b{color:var(--ink)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  .btn{font-family:"IBM Plex Sans";font-weight:600;font-size:14px;border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:10px;padding:10px 18px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .btn:hover{background:#12315e}
+  .btn.ghost{background:transparent;color:var(--navy);border-color:var(--line)}.btn.ghost:hover{background:#EEF3F9}
+  .note{font-size:12.5px;color:var(--ink-faint);margin-top:8px}
+  footer{border-top:1px solid var(--line);padding:22px 0;color:var(--ink-faint);font-size:12.5px}
+  footer a{margin-right:16px}
+  @media print{
+    .topbar,.toolbar,.codebar .hint,footer .links{display:none}
+    body{background:#fff}
+    .card{box-shadow:none;break-inside:avoid}
+    .hero{background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .copy{display:none}
+    .linkbox .u{white-space:normal;word-break:break-all}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-in">
+  <div class="brand"><b>HMF Design Clinic</b><small>Cisco Secure · Event Links</small></div>
+</div></div>
+
+<div class="hero"><div class="wrap">
+  <span class="eyebrow">Facilitator handout</span>
+  <h1>Event links &amp; QR codes</h1>
+  <p>Type your event code below — every link updates instantly. Print this page or keep it open on event day. Teams scan a QR code to join from their phones; you keep the proctor console on your laptop.</p>
+</div></div>
+
+<div class="codebar"><div class="codebar-in">
+  <label for="code">Event&nbsp;code</label>
+  <input id="code" class="mono" value="MAY24" autocomplete="off" spellcheck="false" maxlength="24">
+  <span class="hint">Pick anything short (letters/numbers). All links + QR codes use this code.</span>
+</div></div>
+
+<main class="wrap">
+
+  <div class="toolbar">
+    <button class="btn" onclick="window.print()">🖨&nbsp; Print / Save PDF</button>
+    <button class="btn ghost" id="copyAll">⧉ Copy the two team links</button>
+  </div>
+
+  <!-- TEAMS -->
+  <div class="card team">
+    <h2><span class="tag forteam">For teams</span> Interactive activity — join link</h2>
+    <p class="sub">The main clinic. Teams register, read the Cedarline scenario, and answer the four use cases; submissions sync live to your proctor console.</p>
+    <div class="linkrow">
+      <div class="linkbox"><div class="u" id="uParticipant"></div><button class="copy" data-t="uParticipant">Copy</button></div>
+    </div>
+    <div class="qrpair"><div class="qr"><div class="box" id="qrParticipant"></div><div class="cap"><b>Scan to join</b><br>the activity</div></div></div>
+  </div>
+
+  <!-- GRADER -->
+  <div class="card team">
+    <h2><span class="tag forteam">For teams</span> Solution Grader — upload link <span class="tag" style="background:#EEF3F9;color:#7E8CA1;border:1px solid #CBD5E3">optional / offline flow</span></h2>
+    <p class="sub">Use this instead when teams work on paper or their own docs: they upload a completed worksheet (PDF / Word / text) and it's scored against the answer sheet.</p>
+    <div class="linkrow">
+      <div class="linkbox"><div class="u" id="uGrader"></div><button class="copy" data-t="uGrader">Copy</button></div>
+    </div>
+    <div class="qrpair"><div class="qr"><div class="box" id="qrGrader"></div><div class="cap"><b>Scan to upload</b><br>a worksheet</div></div></div>
+  </div>
+
+  <!-- PROCTOR -->
+  <div class="card proctor">
+    <h2><span class="tag foryou">For you (proctor)</span> Consoles — keep on your laptop</h2>
+    <p class="sub">Don't share these with teams. Set your event code and answer keys here; watch scores come in live.</p>
+    <div class="linkrow" style="margin-bottom:10px">
+      <div class="linkbox"><div class="u" id="uProctor"></div><button class="copy" data-t="uProctor">Copy</button></div>
+    </div>
+    <div class="linkrow">
+      <div class="linkbox"><div class="u" id="uGraderProctor"></div><button class="copy" data-t="uGraderProctor">Copy</button></div>
+    </div>
+    <p class="note">First is the <b>activity proctor console</b>; second is the <b>grader proctor</b> (open its Proctor tab). Both use the same event code.</p>
+  </div>
+
+  <!-- HOW TO RUN -->
+  <div class="card">
+    <h2 style="color:var(--navy)">▸ How to run the event</h2>
+    <ol class="steps">
+      <li>Set your <b>event code</b> above (e.g. <span class="mono">MAY24</span>).</li>
+      <li>Open the <b>proctor console</b>, confirm the code matches, and review the four <b>answer keys</b>.</li>
+      <li>Project or share the <b>team QR code / link</b>. Teams join on their own devices.</li>
+      <li>Teams answer the four use cases and <b>submit</b> — you watch scores appear live and export a CSV at the end.</li>
+    </ol>
+    <p class="note">No internet at the venue? Print the <span class="mono">offline-pack/</span> workbook + proctor sheets and run it on paper — same activity, same scoring.</p>
+  </div>
+
+</main>
+
+<footer><div class="wrap links">
+  <a href="./">Activity</a>
+  <a href="proctor.html">Proctor console</a>
+  <a href="grader.html">Solution Grader</a>
+  <a href="playbook.html">Playbook</a>
+  <span style="color:var(--ink-faint)">· Cedarline Health Group is fictional · Cisco Secure</span>
+</div></footer>
+
+<script>
+  var BASE = location.origin + location.pathname.replace(/event-links\.html$/,"");
+  function clean(c){ return (c||"").trim().toUpperCase().replace(/[^A-Z0-9_-]/g,""); }
+  var LINKS = {
+    uParticipant:   function(c){ return BASE + "?room=" + c; },
+    uGrader:        function(c){ return BASE + "grader.html?room=" + c; },
+    uProctor:       function(c){ return BASE + "proctor.html?room=" + c; },
+    uGraderProctor: function(c){ return BASE + "grader.html?room=" + c; }
+  };
+  var qrP=null, qrG=null;
+  function makeQR(el, text){
+    el.innerHTML="";
+    if(window.QRCode){ new QRCode(el,{text:text,width:160,height:160,correctLevel:QRCode.CorrectLevel.M}); }
+    else{ el.innerHTML='<span style="font-size:11px;color:#7E8CA1">QR needs internet;<br>share the link instead.</span>'; }
+  }
+  function render(){
+    var c = clean(document.getElementById("code").value) || "EVENT";
+    Object.keys(LINKS).forEach(function(id){ document.getElementById(id).textContent = LINKS[id](c); });
+    makeQR(document.getElementById("qrParticipant"), LINKS.uParticipant(c));
+    makeQR(document.getElementById("qrGrader"), LINKS.uGrader(c));
+    try{ localStorage.setItem("hmf:eventcode", c); }catch(e){}
+  }
+  document.getElementById("code").addEventListener("input", render);
+  // restore last code
+  try{ var saved=localStorage.getItem("hmf:eventcode"); if(saved) document.getElementById("code").value=saved; }catch(e){}
+  // copy buttons
+  document.addEventListener("click", function(e){
+    var b=e.target.closest(".copy"); if(!b) return;
+    var txt=document.getElementById(b.getAttribute("data-t")).textContent;
+    navigator.clipboard.writeText(txt).then(function(){ var o=b.textContent; b.textContent="Copied ✓"; b.classList.add("done"); setTimeout(function(){b.textContent=o;b.classList.remove("done");},1300); });
+  });
+  document.getElementById("copyAll").addEventListener("click", function(){
+    var t = document.getElementById("uParticipant").textContent + "\n" + document.getElementById("uGrader").textContent;
+    navigator.clipboard.writeText(t); var b=this,o=b.textContent; b.textContent="Copied ✓"; setTimeout(function(){b.textContent=o;},1300);
+  });
+  render();
+</script>
+</body>
+</html>
