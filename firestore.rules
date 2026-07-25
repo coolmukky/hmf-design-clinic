@@ -44,5 +44,19 @@ service cloud.firestore {
       allow create, update: if request.resource.data.model is string;
       allow delete: if false;
     }
+
+    // Solution Grader (grader.html): proctor's uploaded answer sheet
+    match /graderkey/{id} {
+      allow read: if true;
+      allow create, update: if request.resource.data.text is string;
+      allow delete: if false;
+    }
+
+    // Solution Grader: teams' uploaded worksheets + AI scores
+    match /docscores/{id} {
+      allow read: if true;
+      allow create, update: if request.resource.data.teamName is string;
+      allow delete: if false;
+    }
   }
 }

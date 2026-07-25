@@ -52,6 +52,9 @@ export default {
     if (env.EVAL_SHARED_TOKEN && request.headers.get("x-eval-token") !== env.EVAL_SHARED_TOKEN)
       return json({ error: "unauthorized" }, 401, cors);
 
+    // Whole-document grading: a team's uploaded worksheet graded against the answer sheet across all use cases.
+    if (body.mode === "document") return gradeDocument(body, env, model, cors);
+
     const max = clampInt(body.rubricMax, 1, 1000) || 100;
 
     const system =
@@ -108,6 +111,86 @@ export default {
     return json({ total, rationale: String(use.input.rationale || ""), model }, 200, cors);
   },
 };
+
+/* ---- whole-document grading ---------------------------------------------- */
+async function gradeDocument(body, env, model, cors) {
+  const answerKey = (body.answerKey && body.answerKey.text) ? String(body.answerKey.text) : String(body.answerKeyText || "");
+  const submission = String(body.submissionText || "");
+  if (!submission.trim()) return json({ error: "no submission text provided" }, 400, cors);
+
+  var useCases = Array.isArray(body.useCases) && body.useCases.length ? body.useCases : [
+    { title: "AI Security", max: 100 },
+    { title: "Cloud Edge", max: 100 },
+    { title: "DC Edge · Perimeter Firewall", max: 100 },
+    { title: "Macro & Micro Segmentation", max: 100 },
+  ];
+  var perMax = 100;
+  var totalMax = useCases.reduce(function (s, u) { return s + (u.max || perMax); }, 0);
+  var titles = useCases.map(function (u) { return u.title; });
+
+  const system =
+    "You are an expert Cisco Solution-Engineering examiner. A team has uploaded a completed worksheet for the " +
+    "Cedarline Hybrid Mesh Firewall (HMF) design clinic. Grade the WHOLE worksheet across these use cases: " +
+    titles.join("; ") + ". For each use case, award 0–" + perMax + " based on how well the team named the right/" +
+    "appropriate Cisco products AND gave Solution-Engineer reasoning that addresses each customer concern and is " +
+    "specific to Cedarline's constraints (encrypted-traffic compliance limits, ~10k-rule segmentation failures, " +
+    "two-engineer team, three cloud policy models, inherited rulebase, AI assets across clouds). Grade primarily " +
+    "against the proctor's ANSWER KEY when provided; otherwise against sound Cisco Secure / HMF practice. Do not " +
+    "reward blank, vague, or off-topic answers, or product names with no reasoning. Some use cases may be absent " +
+    "from the worksheet — score those 0 and say so. Always respond by calling submit_doc_score.";
+
+  const userText =
+    "=== PROCTOR ANSWER KEY ===\n" + (answerKey ? answerKey : "(none provided — grade against sound Cisco Secure / HMF practice)") +
+    "\n\n=== TEAM'S UPLOADED WORKSHEET (grade this) ===\n" + submission.slice(0, 45000) +
+    "\n\nScore each use case 0–" + perMax + " and call submit_doc_score.";
+
+  const tool = {
+    name: "submit_doc_score",
+    description: "Return per-use-case scores and a short overall rationale.",
+    input_schema: {
+      type: "object",
+      properties: {
+        scores: {
+          type: "array",
+          description: "One entry per use case, in the same order given.",
+          items: {
+            type: "object",
+            properties: {
+              useCase: { type: "string" },
+              score: { type: "integer", minimum: 0, maximum: perMax },
+              note: { type: "string", description: "1–2 sentences: what was strong / missing." },
+            },
+            required: ["useCase", "score", "note"],
+          },
+        },
+        rationale: { type: "string", description: "2–4 sentences overall." },
+      },
+      required: ["scores", "rationale"],
+    },
+  };
+
+  let ar;
+  try {
+    ar = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model, max_tokens: 1500, system, tools: [tool], tool_choice: { type: "tool", name: "submit_doc_score" }, messages: [{ role: "user", content: [{ type: "text", text: userText }] }] }),
+    });
+  } catch (e) {
+    return json({ error: "could not reach Anthropic API", detail: String(e && e.message || e) }, 502, cors);
+  }
+  if (!ar.ok) { const t = await ar.text(); return json({ error: "model API error (" + ar.status + ")", detail: t.slice(0, 600) }, 502, cors); }
+  const data = await ar.json();
+  const use = (data.content || []).find(function (b) { return b.type === "tool_use"; });
+  if (!use || !use.input || !Array.isArray(use.input.scores)) return json({ error: "model returned no structured score" }, 502, cors);
+
+  const perUseCase = titles.map(function (title, i) {
+    const found = use.input.scores.find(function (s) { return s.useCase && s.useCase.toLowerCase().indexOf(title.toLowerCase().slice(0, 8)) >= 0; }) || use.input.scores[i] || {};
+    return { title: title, score: clampInt(found.score, 0, perMax), note: String(found.note || "") };
+  });
+  const total = perUseCase.reduce(function (s, u) { return s + u.score; }, 0);
+  return json({ perUseCase: perUseCase, total: total, totalMax: totalMax, rationale: String(use.input.rationale || ""), model: model }, 200, cors);
+}
 
 function buildUserText(body, max) {
   const uc = body.useCase || {};

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMF Design Clinic — Solution Grader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F3F6FA;--surface:#fff;--ink:#0E1A2B;--ink-soft:#46566E;--ink-faint:#7E8CA1;--line:#CBD5E3;--line-soft:#E1E8F1;--navy:#0D274D;--cyan:#00BCEB;--cyan-deep:#036C8F;--amber:#E2891F;--red:#DB4A4A;--green:#27A276;--green-soft:#D7F0E6;--amber-soft:#FBEBD3;--red-soft:#FBE2E2;--shadow:0 1px 0 rgba(14,26,43,.04),0 18px 40px -28px rgba(14,26,43,.55);--radius:14px}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:"Chakra Petch",sans-serif;margin:0;line-height:1.12;letter-spacing:-.01em}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  a{color:var(--cyan-deep)}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  .eyebrow{font-family:"IBM Plex Mono";font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan-deep)}
+  .topbar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#0c1d34,#0a1830);border-bottom:2px solid var(--cyan);color:#EAF1F8}
+  .topbar-in{max-width:920px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;line-height:1.15}
+  .brand b{font-family:"Chakra Petch";font-size:15px;color:#fff}
+  .brand small{font-family:"IBM Plex Mono";font-size:10px;letter-spacing:.12em;color:#7FE2EF;text-transform:uppercase}
+  .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .roombox{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:4px 6px 4px 10px}
+  .roombox label{font-family:"IBM Plex Mono";font-size:10px;letter-spacing:.1em;color:#9FB6CE;text-transform:uppercase}
+  .roombox input{width:96px;background:transparent;border:none;color:#fff;font-family:"IBM Plex Mono";font-size:13px;text-transform:uppercase;outline:none}
+  .tb-sync{font-family:"IBM Plex Mono";font-size:10px;display:inline-flex;align-items:center;gap:6px;color:#9FB6CE}
+  .tb-sync i{width:8px;height:8px;border-radius:50%;background:#8593A6;display:inline-block}
+  .tb-sync.live i{background:var(--green);box-shadow:0 0 0 3px rgba(39,162,118,.25)}
+  .tabs{display:flex;gap:8px;margin:20px 0 16px}
+  .tab{font-family:"IBM Plex Mono";font-size:13px;font-weight:600;border:1px solid var(--line);background:#EEF3F9;color:var(--ink-soft);border-radius:10px;padding:10px 18px;cursor:pointer}
+  .tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+  h2.big{font-size:22px;font-weight:700;margin-bottom:4px}
+  .lede{color:var(--ink-soft);font-size:14px}
+  label.field{display:block;margin:12px 0}
+  label.field span{display:block;font-family:"IBM Plex Mono";font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan-deep);margin-bottom:5px}
+  input[type=text],textarea,select{width:100%;font-family:"IBM Plex Sans";font-size:14px;color:var(--ink);background:#FBFDFF;border:1px solid var(--line);border-radius:9px;padding:10px 12px;outline:none}
+  textarea{resize:vertical;min-height:120px;line-height:1.5;font-size:13px}
+  input:focus,textarea:focus,select:focus{border-color:var(--cyan-deep);box-shadow:0 0 0 3px rgba(3,108,143,.12)}
+  .drop{border:2px dashed var(--cyan);border-radius:12px;background:#F7FCFE;padding:22px;text-align:center;cursor:pointer;transition:background .15s}
+  .drop:hover,.drop.over{background:#EAF7FB}
+  .drop svg{width:30px;height:30px;color:var(--cyan-deep)}
+  .drop .t{font-weight:600;font-size:14px;margin-top:6px}
+  .drop .s{font-size:12px;color:var(--ink-faint);margin-top:2px}
+  .filechip{display:inline-flex;align-items:center;gap:9px;background:#EEF3F9;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px;margin-top:10px}
+  .filechip .st{font-family:"IBM Plex Mono";font-size:11px;color:var(--ink-faint)}
+  .btn{font-family:"IBM Plex Sans";font-weight:600;font-size:14px;border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:10px;padding:11px 20px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{background:#12315e}.btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.cyan{background:var(--cyan-deep);border-color:var(--cyan-deep)}.btn.cyan:hover{background:#02566f}
+  .btn.green{background:var(--green);border-color:var(--green)}.btn.green:hover{background:#22916a}
+  .btn.ghost{background:transparent;color:var(--navy);border-color:var(--line)}.btn.ghost:hover{background:#EEF3F9}
+  .btn.sm{font-size:12px;padding:7px 13px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .err{color:#a12e2e;background:var(--red-soft);border:1px solid #F0C4C4;border-radius:9px;padding:9px 13px;font-size:13px;margin-top:12px;display:none}
+  .err.on{display:block}
+  .pill{font-family:"IBM Plex Mono";font-size:11px;border-radius:20px;padding:3px 10px;display:inline-flex;align-items:center;gap:5px}
+  .pill.ok{background:var(--green-soft);color:#155c43;border:1px solid #A9DEC9}
+  .pill.warn{background:var(--amber-soft);color:#8a560f;border:1px solid #F0CE97}
+  .pill.off{background:#EEF3F9;color:var(--ink-faint);border:1px solid var(--line)}
+  /* results */
+  .total{background:linear-gradient(160deg,var(--navy),#041E42);color:#EAF1F8;border-radius:14px;padding:20px;text-align:center;margin-bottom:14px}
+  .total .n{font-family:"Chakra Petch";font-size:46px;font-weight:700;color:#fff;line-height:1}
+  .total .l{color:#9FB6CE;font-size:12px}
+  .uc{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line-soft)}
+  .uc:last-child{border-bottom:none}
+  .uc .nm{flex:1}
+  .uc .nm b{font-size:14px}.uc .nm p{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft)}
+  .uc .sc{font-family:"Chakra Petch";font-weight:700;font-size:20px;color:var(--cyan-deep);white-space:nowrap}
+  .bar{height:7px;border-radius:4px;background:#E4EAF2;overflow:hidden;margin-top:5px}
+  .bar i{display:block;height:100%;background:var(--cyan)}
+  .rationale{font-size:13px;color:var(--ink-soft);background:#F7F9FC;border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;margin-top:12px}
+  .rationale b{color:var(--ink)}
+  /* teams table */
+  .tblwrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
+  table.t{width:100%;border-collapse:collapse;font-size:13px;background:#fff;min-width:520px}
+  table.t th{background:var(--navy);color:#fff;text-align:left;padding:10px 12px;font-family:"Chakra Petch";font-weight:600;font-size:12.5px}
+  table.t td{padding:11px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink-soft)}
+  table.t tr:last-child td{border-bottom:none}
+  table.t td b{color:var(--ink)}
+  .view{font-family:"IBM Plex Mono";font-size:11px;color:var(--cyan-deep);cursor:pointer;background:none;border:none;text-decoration:underline;padding:0}
+  .empty{text-align:center;color:var(--ink-faint);padding:32px;font-size:14px}
+  .modal{position:fixed;inset:0;z-index:100;background:rgba(6,16,30,.55);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+  .modal.on{display:flex}
+  .modal-in{background:#fff;border-radius:16px;max-width:680px;width:100%;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+  .modal-h{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line-soft)}
+  .modal-h h3{font-size:16px}.modal-h .x{margin-left:auto;background:none;border:none;font-size:24px;color:var(--ink-faint);cursor:pointer}
+  .modal-b{padding:18px 20px}
+  .foot{margin:30px 0;padding-top:16px;border-top:1px solid var(--line);font-family:"IBM Plex Mono";font-size:11px;color:var(--ink-faint);text-align:center}
+  .note{display:flex;gap:10px;align-items:flex-start;background:#EAF7F9;border:1px solid #B6E4EB;border-radius:11px;padding:12px 14px;font-size:13px;color:#0a5560;margin-top:6px}
+  .note svg{width:18px;height:18px;color:var(--cyan-deep);flex-shrink:0;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="topbar-in">
+  <div class="brand"><b>HMF Solution Grader</b><small>Upload &amp; AI-score worksheets</small></div>
+  <div class="tb-right">
+    <span class="tb-sync" id="syncBadge"><i></i><span id="syncLabel">This device</span></span>
+    <div class="roombox"><label>Event</label><input type="text" id="roomInput" maxlength="12" placeholder="CODE"><button class="btn sm cyan" id="roomSet" type="button">Set</button></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab on" id="tabTeam" type="button">📤 Team — submit worksheet</button>
+    <button class="tab" id="tabProctor" type="button">🔑 Proctor — answer sheet &amp; scores</button>
+  </div>
+
+  <!-- ================= TEAM ================= -->
+  <section id="paneTeam">
+    <div class="card">
+      <h2 class="big">Submit your completed worksheet</h2>
+      <p class="lede">Upload your team's filled worksheet (PDF, Word .docx, or text) — or paste your answers — and get an AI score against the proctor's answer key.</p>
+      <label class="field"><span>Team name</span><input type="text" id="teamName" placeholder="e.g. Blue Team" maxlength="60"></label>
+      <label class="field"><span>Your worksheet</span></label>
+      <div class="drop" id="drop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        <div class="t">Click to choose a file, or drag it here</div>
+        <div class="s">PDF · Word (.docx) · text — we extract the text automatically</div>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt,text/plain" hidden>
+      </div>
+      <div id="fileStatus"></div>
+      <label class="field"><span>Extracted / pasted answers <span style="text-transform:none;letter-spacing:0;color:var(--ink-faint)">— edit or paste directly if needed</span></span><textarea id="submissionText" placeholder="Your worksheet text appears here after upload — or paste your team's answers…"></textarea></label>
+      <div class="row"><button class="btn green" id="btnEvaluate" type="button">Evaluate my worksheet with AI</button><span class="mono" id="evalMsg" style="font-size:11px;color:var(--ink-faint)"></span></div>
+      <div class="err" id="teamErr"></div>
+    </div>
+    <div class="card" id="resultCard" hidden>
+      <h2 class="big">Your result</h2>
+      <div id="resultBody"></div>
+    </div>
+  </section>
+
+  <!-- ================= PROCTOR ================= -->
+  <section id="paneProctor" hidden>
+    <div class="card">
+      <h2 class="big">Answer sheet</h2>
+      <p class="lede">The reference the AI grades against. Pre-filled from the built-in aligned use-case content — upload your own answer sheet (PDF/DOCX/TXT) or edit the text, then Save.</p>
+      <div class="drop" id="dropKey" style="padding:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        <div class="t">Upload an answer sheet</div><div class="s">PDF · Word (.docx) · text</div>
+        <input type="file" id="keyFile" accept=".pdf,.docx,.txt,text/plain" hidden>
+      </div>
+      <div id="keyStatus"></div>
+      <label class="field"><span>Answer sheet text</span><textarea id="keyText" style="min-height:180px"></textarea></label>
+      <div class="row"><button class="btn green" id="btnSaveKey" type="button">Save answer sheet</button><span class="mono" id="keySaved" style="font-size:11px;color:var(--ink-faint)"></span></div>
+    </div>
+    <div class="card">
+      <h2 class="big">AI settings</h2>
+      <div class="row" style="margin-top:6px">
+        <label class="field" style="flex:1;margin:0"><span>Model</span><select id="modelSel"><option value="claude-opus-4-8">Claude Opus 4.8 — most capable</option><option value="claude-sonnet-5">Claude Sonnet 5 — balanced</option><option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — fastest</option></select></label>
+      </div>
+      <div class="row"><span id="aiStatus" class="pill off">AI endpoint not set</span><button class="btn ghost sm" id="aiTest" type="button">Test AI</button><span class="mono" id="aiMsg" style="font-size:11px;color:var(--ink-faint)"></span></div>
+      <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p>AI grading needs the evaluation worker configured (<span class="mono">AI_EVAL_ENDPOINT</span> in firebase-config.js — see SETUP-HMF.md). Until then, submissions are saved and can be graded once it's live.</p></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><h2 class="big">Team submissions &amp; scores</h2><span class="mono" id="teamCount" style="font-size:12px;color:var(--ink-faint)"></span><button class="btn ghost sm" id="exportCsv" type="button" style="margin-left:auto">Export CSV</button></div>
+      <div id="teamList" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <div class="foot">HMF Design Clinic · Solution Grader · Cedarline Health Group is fictional</div>
+</div>
+
+<div class="modal" id="modal"><div class="modal-in"><div class="modal-h"><h3 id="mTitle">Submission</h3><button class="x" id="mClose" type="button">&times;</button></div><div class="modal-b" id="mBody"></div></div></div>
+
+<script src="hmf-data.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+function HMF_START(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+  var HMF=window.HMF_DATA||{useCases:[],defaultKeys:{}};
+  var USECASES=HMF.useCases.map(function(u){return {id:u.id,title:u.title,max:100};});
+  var TOTAL_MAX=USECASES.length*100||400;
+
+  /* combined default answer sheet from the aligned content */
+  function defaultAnswerSheet(){
+    if(!HMF.useCases.length) return "";
+    return HMF.useCases.map(function(u){ return "USE CASE: "+u.title+"\n"+(HMF.defaultKeys[u.id]||""); }).join("\n\n──────────\n\n");
+  }
+
+  var params=new URLSearchParams(location.search);
+  var ROOM=(params.get("room")||localStorage.getItem("hmf:grader:lastRoom")||"default").toUpperCase();
+
+  /* ---- storage: local or cloud adapter ---- */
+  var CLOUD=window.HMF_CLOUD||null;
+  var bc=("BroadcastChannel" in window)?new BroadcastChannel("hmf-sync"):null;
+  function lsKey(p){return "hmf:"+p;}
+  var _docSubs=[], _collSubs=[];
+  function localRefresh(path){
+    _docSubs.forEach(function(s){ if(s.path===path) Store.read(s.path).then(s.cb); });
+    _collSubs.forEach(function(s){ if(!path || path.indexOf(s.prefix)===0) s.scan(); });
+  }
+  if(bc) bc.addEventListener("message",function(e){ if(e.data&&e.data.path) localRefresh(e.data.path); });
+  window.addEventListener("storage",function(e){ if(e.key&&e.key.indexOf("hmf:")===0) localRefresh(e.key.slice(4)); });
+  var Store={
+    write:function(path,obj){ if(CLOUD){try{CLOUD.write(path,obj);}catch(e){}return;} try{localStorage.setItem(lsKey(path),JSON.stringify(obj));}catch(e){} localRefresh(path); if(bc)bc.postMessage({path:path}); },
+    read:function(path){ if(CLOUD)return CLOUD.read(path); try{var v=localStorage.getItem(lsKey(path));return Promise.resolve(v?JSON.parse(v):null);}catch(e){return Promise.resolve(null);} },
+    watch:function(path,cb){ if(CLOUD)return CLOUD.watch(path,cb); _docSubs.push({path:path,cb:cb}); this.read(path).then(cb); return function(){}; },
+    watchCollection:function(prefix,cb){ if(CLOUD)return CLOUD.watchCollection(prefix,cb); var scan=function(){var out=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf(lsKey(prefix))===0){try{out.push({path:k.slice(4),data:JSON.parse(localStorage.getItem(k))});}catch(e){}}}cb(out);}; _collSubs.push({prefix:prefix,scan:scan}); scan(); return function(){}; }
+  };
+  function keyPath(){return "graderkey/"+ROOM;}
+  function scorePath(slug){return "docscores/"+ROOM+"__"+slug;}
+  function scorePrefix(){return "docscores/"+ROOM+"__";}
+  function slug(s){return String(s||"team").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||"team";}
+
+  function setSync(){var b=$("#syncBadge"),l=$("#syncLabel");if(CLOUD){b.classList.add("live");l.textContent="Live · shared";}else{b.classList.remove("live");l.textContent="This device";}}
+  $("#roomInput").value=ROOM; localStorage.setItem("hmf:grader:lastRoom",ROOM);
+  $("#roomSet").addEventListener("click",function(){var v=$("#roomInput").value.trim().toUpperCase();if(v)location.search="?room="+encodeURIComponent(v);});
+  $("#roomInput").addEventListener("keydown",function(e){if(e.key==="Enter")$("#roomSet").click();});
+
+  /* ---- tabs ---- */
+  $("#tabTeam").addEventListener("click",function(){this.classList.add("on");$("#tabProctor").classList.remove("on");$("#paneTeam").hidden=false;$("#paneProctor").hidden=true;});
+  $("#tabProctor").addEventListener("click",function(){this.classList.add("on");$("#tabTeam").classList.remove("on");$("#paneTeam").hidden=true;$("#paneProctor").hidden=false;});
+
+  /* ---- lazy-loaded extractors (pdf.js / mammoth from CDN) ---- */
+  var loaded={};
+  function loadScript(url){ if(loaded[url])return loaded[url]; loaded[url]=new Promise(function(res,rej){var s=document.createElement("script");s.src=url;s.onload=res;s.onerror=function(){rej(new Error("Could not load helper library (offline?). Paste your text instead."));};document.head.appendChild(s);}); return loaded[url]; }
+  var PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+  var PDFJSW="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  var MAMMOTH="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js";
+  function extractText(file){
+    var name=(file.name||"").toLowerCase();
+    if(name.endsWith(".txt")||(file.type||"").indexOf("text/")===0) return file.text();
+    if(name.endsWith(".pdf")) return loadScript(PDFJS).then(function(){ window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJSW; return file.arrayBuffer(); }).then(function(buf){ return window.pdfjsLib.getDocument({data:buf}).promise; }).then(function(pdf){ var jobs=[]; for(var i=1;i<=pdf.numPages;i++)jobs.push(pdf.getPage(i).then(function(p){return p.getTextContent();}).then(function(c){return c.items.map(function(it){return it.str;}).join(" ");})); return Promise.all(jobs).then(function(pages){return pages.join("\n");}); });
+    if(name.endsWith(".docx")) return loadScript(MAMMOTH).then(function(){return file.arrayBuffer();}).then(function(buf){return window.mammoth.extractRawText({arrayBuffer:buf});}).then(function(r){return r.value;});
+    return Promise.reject(new Error("Unsupported file type. Use PDF, DOCX or TXT — or paste your text."));
+  }
+  function wireDrop(dropEl,inputEl,onText,statusEl){
+    dropEl.addEventListener("click",function(){inputEl.click();});
+    dropEl.addEventListener("dragover",function(e){e.preventDefault();dropEl.classList.add("over");});
+    dropEl.addEventListener("dragleave",function(){dropEl.classList.remove("over");});
+    dropEl.addEventListener("drop",function(e){e.preventDefault();dropEl.classList.remove("over");if(e.dataTransfer.files[0])handle(e.dataTransfer.files[0]);});
+    inputEl.addEventListener("change",function(){if(inputEl.files[0])handle(inputEl.files[0]);});
+    function handle(file){
+      statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st">extracting…</span></div>';
+      extractText(file).then(function(text){ onText(text||""); statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--green)">✓ '+(text||"").length+' chars extracted</span></div>'; })
+        .catch(function(err){ statusEl.innerHTML='<div class="filechip">📄 '+esc(file.name)+' <span class="st" style="color:var(--red)">'+esc(err.message)+'</span></div>'; });
+    }
+  }
+  wireDrop($("#drop"),$("#fileInput"),function(t){$("#submissionText").value=t;},$("#fileStatus"));
+  wireDrop($("#dropKey"),$("#keyFile"),function(t){$("#keyText").value=t;},$("#keyStatus"));
+
+  /* ---- proctor: answer key ---- */
+  function loadKey(){ Store.watch(keyPath(),function(k){ var ta=$("#keyText"); if(document.activeElement!==ta){ ta.value=(k&&k.text)?k.text:defaultAnswerSheet(); } }); }
+  $("#btnSaveKey").addEventListener("click",function(){ Store.write(keyPath(),{text:$("#keyText").value,updatedAt:Date.now()}); $("#keySaved").textContent="saved ✓"; setTimeout(function(){$("#keySaved").textContent="";},1400); });
+
+  /* ---- AI settings ---- */
+  function endpoint(){return window.AI_EVAL_ENDPOINT||"";}
+  function model(){return $("#modelSel").value;}
+  function refreshAi(){var s=$("#aiStatus");if(endpoint()){s.className="pill ok";s.textContent="AI endpoint set";}else{s.className="pill off";s.textContent="AI endpoint not set";}}
+  $("#aiTest").addEventListener("click",function(){var m=$("#aiMsg"),ep=endpoint();if(!ep){m.textContent="No AI endpoint (see setup).";return;}m.textContent="Testing…";var t0=Date.now();fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ping:true,model:model()})}).then(function(r){return r.json().catch(function(){return{};}).then(function(j){return{ok:r.ok,j:j};});}).then(function(o){m.textContent=(o.ok?"AI endpoint OK":"responded")+" · "+(Date.now()-t0)+" ms";}).catch(function(e){m.textContent="error: "+e;});});
+
+  /* ---- team: evaluate ---- */
+  $("#btnEvaluate").addEventListener("click",function(){
+    var name=$("#teamName").value.trim(), text=$("#submissionText").value.trim(), err=$("#teamErr");
+    if(!name){err.textContent="Enter your team name.";err.classList.add("on");return;}
+    if(text.length<20){err.textContent="Upload or paste your worksheet answers first.";err.classList.add("on");return;}
+    err.classList.remove("on");
+    var msg=$("#evalMsg"); var sl=slug(name);
+    Store.read(keyPath()).then(function(k){
+      var answerKey={text:(k&&k.text)?k.text:defaultAnswerSheet()};
+      // save the submission immediately
+      var base={teamName:name,slug:sl,room:ROOM,submissionText:text,updatedAt:Date.now()};
+      Store.write(scorePath(sl),base);
+      if(!endpoint()){ msg.textContent="Saved — awaiting AI (endpoint not configured)."; renderResult({teamName:name,pending:true}); return; }
+      msg.textContent="Evaluating…"; $("#btnEvaluate").disabled=true;
+      fetch(endpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"document",model:model(),answerKey:answerKey,submissionText:text,useCases:USECASES})})
+        .then(function(r){return r.ok?r.json():r.text().then(function(t){throw new Error(t.slice(0,140));});})
+        .then(function(res){
+          var rec=Object.assign({},base,{perUseCase:res.perUseCase||[],total:res.total||0,totalMax:res.totalMax||TOTAL_MAX,rationale:res.rationale||"",method:"ai",model:res.model||model(),at:Date.now()});
+          Store.write(scorePath(sl),rec); renderResult(rec); msg.textContent="Done · "+(res.model||model());
+        })
+        .catch(function(e){ msg.textContent="AI error: "+e.message; })
+        .then(function(){ $("#btnEvaluate").disabled=false; });
+    });
+  });
+  function renderResult(rec){
+    var host=$("#resultBody"); $("#resultCard").hidden=false; $("#resultCard").scrollIntoView({behavior:"smooth"});
+    if(rec.pending){ host.innerHTML='<div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p><b>'+esc(rec.teamName)+'</b> — submission saved. AI scoring isn\'t configured yet; the proctor can grade it once the AI endpoint is live.</p></div>'; return; }
+    var html='<div class="total"><div class="n">'+rec.total+' <span style="font-size:20px;color:#9FB6CE">/ '+(rec.totalMax||TOTAL_MAX)+'</span></div><div class="l">'+esc(rec.teamName)+' · total across '+ (rec.perUseCase?rec.perUseCase.length:USECASES.length) +' use cases</div></div>';
+    (rec.perUseCase||[]).forEach(function(u){ var pct=Math.round((u.score/100)*100); html+='<div class="uc"><div class="nm"><b>'+esc(u.title)+'</b><div class="bar"><i style="width:'+pct+'%"></i></div>'+(u.note?'<p>'+esc(u.note)+'</p>':'')+'</div><div class="sc">'+u.score+'<span style="font-size:12px;color:var(--ink-faint)">/100</span></div></div>'; });
+    if(rec.rationale) html+='<div class="rationale"><b>Overall.</b> '+esc(rec.rationale)+'</div>';
+    host.innerHTML=html;
+  }
+
+  /* ---- proctor: team list ---- */
+  var TEAMS={};
+  function watchTeams(){ Store.watchCollection(scorePrefix(),function(list){ TEAMS={}; list.forEach(function(it){ TEAMS[it.path.split("__").pop()]=it.data; }); renderTeams(); }); }
+  function renderTeams(){
+    var host=$("#teamList"), keys=Object.keys(TEAMS);
+    $("#teamCount").textContent=keys.length+" submission"+(keys.length===1?"":"s");
+    if(!keys.length){ host.innerHTML='<div class="empty">No submissions yet for event <b class="mono">'+ROOM+'</b>.</div>'; return; }
+    keys.sort(function(a,b){return (TEAMS[b].total||0)-(TEAMS[a].total||0);});
+    var rows=keys.map(function(k){var t=TEAMS[k];var sc=(typeof t.total==="number")?(t.total+' / '+(t.totalMax||TOTAL_MAX)):'—';var st=(typeof t.total==="number")?'<span class="pill ok">'+(t.method==="ai"?"AI":"scored")+'</span>':'<span class="pill warn">awaiting</span>';return '<tr><td><b>'+esc(t.teamName||k)+'</b></td><td>'+sc+'</td><td>'+st+'</td><td><button class="view" data-k="'+esc(k)+'">view</button></td></tr>';}).join("");
+    host.innerHTML='<div class="tblwrap"><table class="t"><thead><tr><th>Team</th><th>Score</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    $$("#teamList .view").forEach(function(b){b.addEventListener("click",function(){openTeam(b.getAttribute("data-k"));});});
+  }
+  function openTeam(k){
+    var t=TEAMS[k]; $("#mTitle").textContent=t.teamName||k;
+    var html="";
+    if(t.perUseCase&&t.perUseCase.length){ html+='<div class="total" style="padding:14px"><div class="n" style="font-size:34px">'+t.total+' <span style="font-size:16px;color:#9FB6CE">/ '+(t.totalMax||TOTAL_MAX)+'</span></div></div>'; t.perUseCase.forEach(function(u){html+='<div class="uc"><div class="nm"><b>'+esc(u.title)+'</b>'+(u.note?'<p>'+esc(u.note)+'</p>':'')+'</div><div class="sc">'+u.score+'/100</div></div>';}); if(t.rationale)html+='<div class="rationale"><b>Overall.</b> '+esc(t.rationale)+'</div>'; }
+    else html+='<div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p>Submission received — not yet AI-scored.</p></div>';
+    html+='<div style="font-family:IBM Plex Mono;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin:14px 0 6px">Submitted worksheet text</div><div class="rationale" style="max-height:240px;overflow:auto;white-space:pre-wrap">'+esc((t.submissionText||"").slice(0,6000))+'</div>';
+    $("#mBody").innerHTML=html; $("#modal").classList.add("on");
+  }
+  $("#mClose").addEventListener("click",function(){$("#modal").classList.remove("on");});
+  $("#modal").addEventListener("click",function(e){if(e.target===this)this.classList.remove("on");});
+  $("#exportCsv").addEventListener("click",function(){
+    var rows=[["team","total"].concat(USECASES.map(function(u){return u.title;}))];
+    Object.keys(TEAMS).forEach(function(k){var t=TEAMS[k];var r=[t.teamName||k,(typeof t.total==="number")?t.total:""];USECASES.forEach(function(u){var m=(t.perUseCase||[]).find(function(x){return x.title===u.title;});r.push(m?m.score:"");});rows.push(r);});
+    var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+    var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="hmf-grader-"+ROOM+".csv";a.click();
+  });
+
+  function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+  /* init */
+  setSync(); refreshAi(); loadKey(); watchTeams();
+}
+(function(){ if(window.HMF_CLOUD){HMF_START();return;} if(window.HMF_CLOUD_PENDING){var s=false,go=function(){if(s)return;s=true;HMF_START();};window.HMF_ON_CLOUD=go;setTimeout(go,4000);}else{HMF_START();} })();
+</script>
+</body>
+</html>
