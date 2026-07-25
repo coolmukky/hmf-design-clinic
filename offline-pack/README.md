@@ -11,4 +11,8 @@ Run the clinic without the website if you need to. Print and hand out:
 - **HMF-Proctor-Guide.docx** — proctor only. Reference answers for every use
   case and the 0–100 scoring bands.
 
+- **HMF-Proctor-Scoring-Sheet.docx** — proctor only. One landscape page: all
+  teams × four use cases grid to tally scores and totals (out of 400), with the
+  scoring bands printed at the foot.
+
 These mirror the live activity at the site root (index.html / proctor.html).
