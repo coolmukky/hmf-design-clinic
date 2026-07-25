@@ -181,6 +181,8 @@
   </div>
 </div>
 
+<!-- Shared use-case content + reference answer keys (generated from the aligned use-case sheet). -->
+<script src="hmf-data.js"></script>
 <!-- Optional backend: cross-device shared sync + AI scoring. Safe to omit — the console falls back to single-device mode. -->
 <script src="firebase-config.js"></script>
 <script>
@@ -189,12 +191,9 @@ function HMF_START(){
   var $=function(s,r){return (r||document).querySelector(s);};
   var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
 
-  var USECASES=[
-    {id:"ai-security",title:"AI Security",concerns:2},
-    {id:"cloud-edge",title:"Cloud Edge",concerns:2},
-    {id:"dc-edge",title:"DC Edge · Perimeter Firewall",concerns:2},
-    {id:"segmentation",title:"Macro & Micro Segmentation",concerns:2}
-  ];
+  var HMF=(window.HMF_DATA||{useCases:[],defaultKeys:{}});
+  var USECASES=HMF.useCases.map(function(u){ return {id:u.id, title:u.title, concerns:u.concerns.length}; });
+  var DEFAULT_KEYS=HMF.defaultKeys;
   var UC_MAX=100;
 
   var params=new URLSearchParams(location.search);
@@ -289,11 +288,13 @@ function HMF_START(){
     var host=$("#keyList"); host.innerHTML="";
     USECASES.forEach(function(uc,i){
       var d=document.createElement("details"); d.className="keyc";
-      var filled=KEYS[uc.id]&&KEYS[uc.id].text&&KEYS[uc.id].text.trim();
+      var saved=KEYS[uc.id]&&KEYS[uc.id].text&&KEYS[uc.id].text.trim();
+      var shown=saved?KEYS[uc.id].text:(DEFAULT_KEYS[uc.id]||"");   // prefill with built-in reference key
+      var stat=saved?'<span class="pill ok">key saved</span>':(DEFAULT_KEYS[uc.id]?'<span class="pill warn">built-in default · edit &amp; save</span>':'<span class="pill warn">no key yet</span>');
       d.innerHTML='<summary><span class="kn">'+(i+1)+'</span><span class="kt">'+uc.title+'</span>'+
-        '<span class="kstat">'+(filled?'<span class="pill ok">key saved</span>':'<span class="pill warn">no key yet</span>')+'</span></summary>'+
-        '<div class="kbody"><div class="lb">Reference answer / grading notes — expected products &amp; the SE reasoning that earns full marks. The AI grades against this.</div>'+
-        '<textarea id="key-'+uc.id+'" placeholder="e.g. Concern 1 → Cisco Secure Firewall + Encrypted Visibility Engine: detects threats in encrypted traffic without decryption… Concern 2 → …">'+esc(filled?KEYS[uc.id].text:"")+'</textarea>'+
+        '<span class="kstat">'+stat+'</span></summary>'+
+        '<div class="kbody"><div class="lb">Reference answer / grading notes — expected products &amp; the SE reasoning that earns full marks. Pre-filled from the aligned use-case content; edit and Save to customise. The AI grades against this.</div>'+
+        '<textarea id="key-'+uc.id+'">'+esc(shown)+'</textarea>'+
         '<div class="row" style="margin-top:10px"><button class="btn green sm" data-save="'+uc.id+'" type="button">Save key</button><span class="mono" style="font-size:11px;color:var(--ink-faint)" id="ksaved-'+uc.id+'"></span></div></div>';
       host.appendChild(d);
     });
@@ -384,8 +385,9 @@ function HMF_START(){
     var msg=$("#mAiMsg"); var ep=aiEndpoint();
     if(!ep){ msg.textContent="No AI endpoint set (see setup)."; return; }
     msg.textContent="Evaluating…";
-    var payload={ useCase:{id:ucId,title:uc.title}, response:[], answerKey:KEYS[ucId]||null, rubricMax:UC_MAX, model:CFG.model };
-    for(var i=1;i<=uc.concerns;i++){ var f=fields["c"+i]||{}; payload.response.push({product:f.product||"",seResponse:f.se||""}); }
+    var key=(KEYS[ucId]&&KEYS[ucId].text)?KEYS[ucId]:{text:DEFAULT_KEYS[ucId]||""};
+    var payload={ useCase:{id:ucId,title:uc.title}, response:[], answerKey:key, rubricMax:UC_MAX, model:CFG.model };
+    for(var i=1;i<=uc.concerns;i++){ var f=fields["c"+i]||{}; if((f.product&&f.product.trim())||(f.se&&f.se.trim())) payload.response.push({product:f.product||"",seResponse:f.se||""}); }
     fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
       .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
       .then(function(res){ $("#mScore").value=clamp(res.total,0,UC_MAX); $("#mNote").value=res.rationale||""; msg.textContent="AI · "+(res.model||CFG.model)+" — review &amp; Save"; })

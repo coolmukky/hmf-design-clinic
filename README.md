@@ -18,6 +18,7 @@ response**. Answers are scored (0–100 per use case, **400 total**).
 | `index.html` | **Participant app** — team registration, the customer scenario with a Hybrid Mesh Firewall diagram, the four use cases, submit → AI score → running total. Shared auto-sync with a single-device fallback. |
 | `proctor.html` | **Proctor console** — every team, members, per-use-case scores + total; per-use-case answer keys; AI model picker + on/off; CSV export. |
 | `playbook.html` | The static **playbook** (pre-read reference). |
+| `hmf-data.js` | Shared content — all **27 customer pain points** across the four use cases, plus the reference answer keys the AI grades against (generated from the aligned use-case sheet). Consumed by both `index.html` and `proctor.html`. |
 
 ### ⚙️ The backend (optional — turns on multi-device + AI scoring)
 | File | What it is |

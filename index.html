@@ -236,6 +236,8 @@
   <div class="foot">HMF Design Clinic · Cedarline Health Group is fictional · answers auto-save to your team</div>
 </div>
 
+<!-- Shared use-case content + reference answer keys (generated from the aligned use-case sheet). -->
+<script src="hmf-data.js"></script>
 <!-- Optional backend: cross-device shared sync + AI scoring. Safe to omit — the app falls back to single-device mode. -->
 <script src="firebase-config.js"></script>
 <script>
@@ -251,33 +253,9 @@ function HMF_START(){
   var $ = function(s,r){return (r||document).querySelector(s);};
   var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
 
-  /* ---------- use-case content ---------- */
-  var USECASES = [
-    { id:"ai-security", title:"AI Security", tag:"Detection · unknown threats",
-      intro:"March: something landed on a billing workstation and dwelled for four days. Signature-based tools had nothing to match, and most traffic is encrypted.",
-      concerns:[
-        {id:"c1", text:"“We're worried traditional signature-based detection won't catch new or unknown attacks quickly enough.” Four days of dwell time, and nothing to match."},
-        {id:"c2", text:"“We mandated TLS everywhere, so most of our traffic is encrypted and we've lost visibility. Broadly decrypting clinical traffic is a compliance non-starter.”"}
-      ]},
-    { id:"cloud-edge", title:"Cloud Edge", tag:"Multicloud posture",
-      intro:"Claims analytics in AWS, the patient portal in Azure, data science in GCP — three teams, three policy models, three mental models.",
-      concerns:[
-        {id:"c1", text:"“We're deploying across AWS, Azure and GCP, but each cloud has its own constructs and workflows. A policy that means one thing in AWS means something subtly different in Azure.”"},
-        {id:"c2", text:"“Nobody can tell us our security posture across all three clouds.”"}
-      ]},
-    { id:"dc-edge", title:"DC Edge · Perimeter Firewall", tag:"Estate complexity",
-      intro:"Mixed-vendor firewalls, three management consoles, a change backlog measured in weeks, and an inherited rulebase from the acquired data centre.",
-      concerns:[
-        {id:"c1", text:"“Our firewall environment has become too complex to manage manually — mixed vendor, three consoles, a change backlog measured in weeks.”"},
-        {id:"c2", text:"“We inherited DC-2's rulebase and nobody can prove what a rule does, so nobody deletes one. Two engineers hold all the knowledge.”"}
-      ]},
-    { id:"segmentation", title:"Macro & Micro Segmentation", tag:"East-west control",
-      intro:"Inside the data centre it's effectively open. Segmentation has been attempted three times and died each time on ten thousand hand-written rules.",
-      concerns:[
-        {id:"c1", text:"“We don't feel we have enough control over east-west movement inside the data centre — any workload can reach almost any other.”"},
-        {id:"c2", text:"“Once an attacker gets in, they can move laterally across applications. Enforcing segmentation meant writing ~10,000 rules by hand — so it never happened.”"}
-      ]}
-  ];
+  /* ---------- use-case content (from hmf-data.js — all customer pain points) ---------- */
+  var USECASES = (window.HMF_DATA && window.HMF_DATA.useCases) || [];
+  var DEFAULT_KEYS = (window.HMF_DATA && window.HMF_DATA.defaultKeys) || {};
   var UC_MAX = 100; // points per use case
 
   /* ---------- the HMF board diagram (inline SVG) ---------- */
@@ -466,7 +444,8 @@ function HMF_START(){
     var html='';
     html+='<div class="uc-head"><div class="uc-no">'+(S.currentUC+1)+'</div><div class="t"><small>Use Case '+(S.currentUC+1)+' of 4 · '+uc.tag+'</small><h2 class="big" style="font-size:26px">'+uc.title+'</h2></div></div>';
     html+='<div class="uc-intro">'+uc.intro+'</div>';
-    html+='<p style="font-size:13px;color:var(--ink-soft);margin:0 0 4px">For each customer concern, name the <b>Product / platform</b> that solves it, then write the <b>Solution Engineer response</b> — how it addresses the concern and how it helps Cedarline.</p>';
+    if(uc.tip) html+='<div style="border-left:4px solid var(--amber);background:var(--amber-soft);border-radius:0 8px 8px 0;padding:9px 13px;margin:0 0 14px;font-size:13px;color:#5f430c"><b style="color:#8a560f">TIP </b>'+uc.tip+'</div>';
+    html+='<p style="font-size:13px;color:var(--ink-soft);margin:0 0 6px">This use case has <b>'+uc.concerns.length+' customer pain points</b>. Answer the ones assigned to your team — for each, name the <b>Product / platform</b> and write the <b>Solution Engineer response</b> (how it addresses the concern and how it helps). You can submit after answering at least one.</p>';
     html+='<div id="ucConcerns" class="'+(submitted?"locked":"")+'">';
     uc.concerns.forEach(function(c,idx){
       var v=S.answers[uc.id][c.id]||{product:"",se:""};
@@ -535,11 +514,11 @@ function HMF_START(){
 
   /* ---------- submit + AI evaluation ---------- */
   function submitUC(uc){
-    // validate
-    var missing=false;
-    uc.concerns.forEach(function(c){ var v=S.answers[uc.id][c.id]; if(!v.product.trim()||!v.se.trim()) missing=true; });
+    // validate: at least one pain point fully answered (teams answer the ones assigned)
+    var answered=0;
+    uc.concerns.forEach(function(c){ var v=S.answers[uc.id][c.id]; if(v.product.trim()&&v.se.trim()) answered++; });
     var err=$("#ucErr");
-    if(missing){ err.textContent="Fill in a product and an SE response for every concern before submitting."; err.classList.add("on"); return; }
+    if(answered<1){ err.textContent="Answer at least one pain point (a product and an SE response) before submitting."; err.classList.add("on"); return; }
     err.classList.remove("on");
     // flush save immediately
     Store.write(ansPath(uc.id), {fields:S.answers[uc.id], updatedAt:Date.now(), by:S.you});
@@ -554,15 +533,18 @@ function HMF_START(){
 
   function evaluate(uc){
     var endpoint=window.AI_EVAL_ENDPOINT||"";
+    // grade only the pain points the team actually answered
+    var answered=uc.concerns.map(function(c){ var v=S.answers[uc.id][c.id]; return {concern:c.text, product:v.product, seResponse:v.se}; })
+                            .filter(function(r){ return (r.product&&r.product.trim())||(r.seResponse&&r.seResponse.trim()); });
     var payload={
-      useCase:{id:uc.id,title:uc.title,concerns:uc.concerns.map(function(c){return c.text;})},
-      response:uc.concerns.map(function(c){ var v=S.answers[uc.id][c.id]; return {concern:c.text, product:v.product, seResponse:v.se}; }),
+      useCase:{id:uc.id,title:uc.title},
+      response:answered,
       rubricMax:UC_MAX,
       model:window.AI_EVAL_MODEL||undefined
     };
-    // fetch proctor answer key for this use case (drives grading); include if present
+    // grading key: proctor's saved key if present, else the built-in reference key for this use case
     Store.read(keyPath(uc.id)).then(function(key){
-      if(key) payload.answerKey=key;
+      payload.answerKey=(key&&key.text)?key:{text:DEFAULT_KEYS[uc.id]||""};
       if(!endpoint){ /* no backend yet: stays "awaiting"; proctor can score later */ renderUcBarAndFooter(); return; }
       fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
         .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
