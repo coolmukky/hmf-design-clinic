@@ -18,6 +18,7 @@ response**. Answers are scored (0–100 per use case, **400 total**).
 | `index.html` | **Participant app** — team registration, the customer scenario with a Hybrid Mesh Firewall diagram, the four use cases, submit → AI score → running total. Shared auto-sync with a single-device fallback. |
 | `proctor.html` | **Proctor console** — every team, members, per-use-case scores + total; per-use-case answer keys; AI model picker + on/off; CSV export. |
 | `playbook.html` | The static **playbook** (pre-read reference). |
+| `event-links.html` | **Facilitator handout** — type an event code, get every join link + scannable **QR codes** for teams; print / save as PDF. |
 | `grader.html` | **Solution Grader** — a side tool for the *offline* flow: teams upload their completed worksheet (PDF / Word / text), the proctor uploads (or edits) the answer sheet, and the AI scores each team's document across the four use cases (0–100 each, /400). Reuses the same backend + AI worker. |
 | `hmf-data.js` | Shared content — all **27 customer pain points** across the four use cases, plus the reference answer keys the AI grades against (generated from the aligned use-case sheet). Consumed by both `index.html` and `proctor.html`. |
 
@@ -55,10 +56,13 @@ right product **and** Solution-Engineer reasoning that is specific to Cedarline.
 
 ### A) Online (recommended)
 1. **Publish** — repo **Settings → Pages → Deploy from a branch → `main` / root**. Live in ~1–2 min.
-2. **(Optional) Backend** — follow `SETUP-HMF.md`: create a Firebase project and paste its config into `firebase-config.js`, publish `firestore.rules`, then deploy `ai-eval-worker.js` with your Anthropic key and set `AI_EVAL_ENDPOINT`.
-3. **Proctor** opens `/proctor.html`, sets an **event code**, writes the four **answer keys**, and shares the participant join link.
+2. **(Optional) Backend** — follow `SETUP-HMF.md`: create a Firebase project and paste its config into `firebase-config.js`, publish `firestore.rules`. This turns on **cross-device sync** so teams submit from their own devices and the proctor sees everyone live.
+3. **AI scoring** — two ways:
+   - **Quick (no deploy):** in `proctor.html` (or `grader.html`) → **AI settings**, paste an Anthropic API key. It stays in that browser tab only and scores immediately. Best for a single session.
+   - **Shared (server-side key):** deploy `ai-eval-worker.js` with your Anthropic key and set `AI_EVAL_ENDPOINT` in `firebase-config.js`. Best for repeat/shared events. If both are set, the worker wins.
+4. **Proctor** opens `/proctor.html`, sets an **event code**, writes the four **answer keys**, and shares the participant join link (or hand out `event-links.html`).
 
-> With no backend configured, the site still runs in **single-device mode** (one screen, no cross-device sync, manual/no AI scoring).
+> With no backend configured, the site still runs in **single-device mode** (one screen, no cross-device sync). AI scoring works either way once a key/worker is set.
 
 ### B) Offline (paper fallback)
 Print from `offline-pack/`: give each team the **Team Workbook**, keep the
