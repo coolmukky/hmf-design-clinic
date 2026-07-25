@@ -157,8 +157,10 @@
       <div class="row" style="margin-top:6px">
         <label class="field" style="flex:1;margin:0"><span>Model</span><select id="modelSel"><option value="claude-opus-4-8">Claude Opus 4.8 — most capable</option><option value="claude-sonnet-5">Claude Sonnet 5 — balanced</option><option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — fastest</option></select></label>
       </div>
-      <div class="row"><span id="aiStatus" class="pill off">AI endpoint not set</span><button class="btn ghost sm" id="aiTest" type="button">Test AI</button><span class="mono" id="aiMsg" style="font-size:11px;color:var(--ink-faint)"></span></div>
-      <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p>AI grading needs the evaluation worker configured (<span class="mono">AI_EVAL_ENDPOINT</span> in firebase-config.js — see SETUP-HMF.md). Until then, submissions are saved and can be graded once it's live.</p></div>
+      <label class="field" style="margin-top:12px"><span>Quick AI — paste an Anthropic API key <span style="text-transform:none;letter-spacing:0;color:var(--ink-faint)">(no deploy needed; kept in this browser tab only)</span></span><input type="password" id="aiKey" placeholder="sk-ant-…" autocomplete="off"></label>
+      <div class="row"><button class="btn cyan sm" id="btnSaveAiKey" type="button">Use this key</button><button class="btn ghost sm" id="btnClearAiKey" type="button">Clear</button><span class="mono" id="keyStat" style="font-size:11px;color:var(--ink-faint)"></span></div>
+      <div class="row"><span id="aiStatus" class="pill off">AI not configured</span><button class="btn ghost sm" id="aiTest" type="button">Test AI</button><span class="mono" id="aiMsg" style="font-size:11px;color:var(--ink-faint)"></span></div>
+      <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p><b>Two ways to turn on AI:</b> the quickest is to paste your Anthropic API key above (works immediately, key stays in this tab). For a shared/repeat event, deploy the worker instead so the key stays server-side — set <span class="mono">AI_EVAL_ENDPOINT</span> in firebase-config.js (see GRADER-GOLIVE.md). If both are set, the worker is used.</p></div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><h2 class="big">Team submissions &amp; scores</h2><span class="mono" id="teamCount" style="font-size:12px;color:var(--ink-faint)"></span><button class="btn ghost sm" id="exportCsv" type="button" style="margin-left:auto">Export CSV</button></div>
@@ -263,8 +265,38 @@ function HMF_START(){
   /* ---- AI settings ---- */
   function endpoint(){return window.AI_EVAL_ENDPOINT||"";}
   function model(){return $("#modelSel").value;}
-  function refreshAi(){var s=$("#aiStatus");if(endpoint()){s.className="pill ok";s.textContent="AI endpoint set";}else{s.className="pill off";s.textContent="AI endpoint not set";}}
-  $("#aiTest").addEventListener("click",function(){var m=$("#aiMsg"),ep=endpoint();if(!ep){m.textContent="No AI endpoint (see setup).";return;}m.textContent="Testing…";var t0=Date.now();fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ping:true,model:model()})}).then(function(r){return r.json().catch(function(){return{};}).then(function(j){return{ok:r.ok,j:j};});}).then(function(o){m.textContent=(o.ok?"AI endpoint OK":"responded")+" · "+(Date.now()-t0)+" ms";}).catch(function(e){m.textContent="error: "+e;});});
+  function aiKey(){ try{return sessionStorage.getItem("hmf:aikey")||"";}catch(e){return "";} }
+  function setAiKey(k){ try{ if(k)sessionStorage.setItem("hmf:aikey",k); else sessionStorage.removeItem("hmf:aikey"); }catch(e){} }
+  function aiReady(){ return !!endpoint() || !!aiKey(); }
+  function refreshAi(){ var s=$("#aiStatus"); if(endpoint()){s.className="pill ok";s.textContent="AI worker connected";} else if(aiKey()){s.className="pill ok";s.textContent="AI key set (direct)";} else {s.className="pill off";s.textContent="AI not configured";} if(aiKey())$("#keyStat").textContent="key active (this tab)"; }
+  $("#btnSaveAiKey").addEventListener("click",function(){ var k=$("#aiKey").value.trim(); if(k&&k.indexOf("sk-")!==0){$("#keyStat").textContent="that doesn't look like an sk-ant-… key";return;} setAiKey(k); $("#aiKey").value=""; $("#keyStat").textContent=k?"key saved (this tab only)":"cleared"; refreshAi(); });
+  $("#btnClearAiKey").addEventListener("click",function(){ setAiKey(""); $("#aiKey").value=""; $("#keyStat").textContent="cleared"; refreshAi(); });
+
+  /* build the document-grading request (mirrors the worker) for direct browser calls */
+  function docReq(answerKey,submission){
+    var perMax=100, titles=USECASES.map(function(u){return u.title;});
+    var system="You are an expert Cisco Solution-Engineering examiner. A team uploaded a completed worksheet for the "+
+      "Cedarline Hybrid Mesh Firewall (HMF) design clinic. Grade the WHOLE worksheet across these use cases: "+titles.join("; ")+
+      ". For each use case award 0–"+perMax+" based on how well the team named the right Cisco products AND gave SE reasoning "+
+      "that addresses each concern and is specific to Cedarline's constraints. Grade primarily against the ANSWER KEY when provided. "+
+      "Do not reward blank/vague/off-topic answers. Use cases absent from the worksheet score 0. Always call submit_doc_score.";
+    var userText="=== PROCTOR ANSWER KEY ===\n"+(answerKey||"(none provided)")+"\n\n=== TEAM'S WORKSHEET (grade this) ===\n"+submission.slice(0,45000)+"\n\nScore each use case 0–"+perMax+" and call submit_doc_score.";
+    var tool={name:"submit_doc_score",description:"Return per-use-case scores and an overall rationale.",input_schema:{type:"object",properties:{scores:{type:"array",items:{type:"object",properties:{useCase:{type:"string"},score:{type:"integer",minimum:0,maximum:perMax},note:{type:"string"}},required:["useCase","score","note"]}},rationale:{type:"string"}},required:["scores","rationale"]}};
+    return {perMax:perMax,titles:titles,body:{model:model(),max_tokens:1500,system:system,tools:[tool],tool_choice:{type:"tool",name:"submit_doc_score"},messages:[{role:"user",content:[{type:"text",text:userText}]}]}};
+  }
+  function parseDoc(data,titles,perMax){
+    var use=(data.content||[]).find(function(b){return b.type==="tool_use";});
+    if(!use||!use.input||!Array.isArray(use.input.scores)) throw new Error("model returned no structured score");
+    var per=titles.map(function(t,i){ var f=use.input.scores.find(function(s){return s.useCase&&s.useCase.toLowerCase().indexOf(t.toLowerCase().slice(0,8))>=0;})||use.input.scores[i]||{}; var sc=parseInt(f.score,10); if(isNaN(sc))sc=0; return {title:t,score:Math.max(0,Math.min(perMax,sc)),note:String(f.note||"")}; });
+    return {perUseCase:per,total:per.reduce(function(s,u){return s+u.score;},0),totalMax:titles.length*perMax,rationale:String(use.input.rationale||"")};
+  }
+  var ANTHROPIC="https://api.anthropic.com/v1/messages";
+  $("#aiTest").addEventListener("click",function(){
+    var m=$("#aiMsg"), t0=Date.now();
+    if(endpoint()){ m.textContent="Testing…"; fetch(endpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ping:true,model:model()})}).then(function(r){return r.json().catch(function(){return{};}).then(function(j){return{ok:r.ok,j:j};});}).then(function(o){m.textContent=(o.ok?"AI worker OK":"responded")+" · "+(Date.now()-t0)+" ms";}).catch(function(e){m.textContent="error: "+e;}); return; }
+    if(aiKey()){ m.textContent="Testing key…"; fetch(ANTHROPIC,{method:"POST",headers:{"content-type":"application/json","x-api-key":aiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:model(),max_tokens:8,messages:[{role:"user",content:"ping"}]})}).then(function(r){return r.ok?{ok:true}:r.text().then(function(t){throw new Error(t.slice(0,120));});}).then(function(){m.textContent="AI key OK · "+(Date.now()-t0)+" ms";}).catch(function(e){m.textContent="key error: "+e.message;}); return; }
+    m.textContent="No AI configured — paste a key above or set the worker endpoint.";
+  });
 
   /* ---- team: evaluate ---- */
   $("#btnEvaluate").addEventListener("click",function(){
@@ -272,27 +304,30 @@ function HMF_START(){
     if(!name){err.textContent="Enter your team name.";err.classList.add("on");return;}
     if(text.length<20){err.textContent="Upload or paste your worksheet answers first.";err.classList.add("on");return;}
     err.classList.remove("on");
-    var msg=$("#evalMsg"); var sl=slug(name);
+    var msg=$("#evalMsg"), sl=slug(name);
     Store.read(keyPath()).then(function(k){
-      var answerKey={text:(k&&k.text)?k.text:defaultAnswerSheet()};
-      // save the submission immediately
+      var answerKey=(k&&k.text)?k.text:defaultAnswerSheet();
       var base={teamName:name,slug:sl,room:ROOM,submissionText:text,updatedAt:Date.now()};
       Store.write(scorePath(sl),base);
-      if(!endpoint()){ msg.textContent="Saved — awaiting AI (endpoint not configured)."; renderResult({teamName:name,pending:true}); return; }
+      function done(res){ var rec=Object.assign({},base,{perUseCase:res.perUseCase||[],total:res.total||0,totalMax:res.totalMax||TOTAL_MAX,rationale:res.rationale||"",method:"ai",model:model(),at:Date.now()}); Store.write(scorePath(sl),rec); renderResult(rec); msg.textContent="Done · "+model(); }
+      function fail(e){ msg.textContent="AI error: "+(e.message||e); }
+      if(!aiReady()){ msg.textContent="Saved — turn on AI (paste a key in the Proctor tab) to score."; renderResult({teamName:name,pending:true}); return; }
       msg.textContent="Evaluating…"; $("#btnEvaluate").disabled=true;
-      fetch(endpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"document",model:model(),answerKey:answerKey,submissionText:text,useCases:USECASES})})
-        .then(function(r){return r.ok?r.json():r.text().then(function(t){throw new Error(t.slice(0,140));});})
-        .then(function(res){
-          var rec=Object.assign({},base,{perUseCase:res.perUseCase||[],total:res.total||0,totalMax:res.totalMax||TOTAL_MAX,rationale:res.rationale||"",method:"ai",model:res.model||model(),at:Date.now()});
-          Store.write(scorePath(sl),rec); renderResult(rec); msg.textContent="Done · "+(res.model||model());
-        })
-        .catch(function(e){ msg.textContent="AI error: "+e.message; })
-        .then(function(){ $("#btnEvaluate").disabled=false; });
+      var p;
+      if(endpoint()){
+        p=fetch(endpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"document",model:model(),answerKey:{text:answerKey},submissionText:text,useCases:USECASES})})
+          .then(function(r){return r.ok?r.json():r.text().then(function(t){throw new Error(t.slice(0,140));});}).then(done);
+      } else {
+        var req=docReq(answerKey,text);
+        p=fetch(ANTHROPIC,{method:"POST",headers:{"content-type":"application/json","x-api-key":aiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify(req.body)})
+          .then(function(r){return r.ok?r.json():r.text().then(function(t){throw new Error(t.slice(0,140));});}).then(function(data){ done(parseDoc(data,req.titles,req.perMax)); });
+      }
+      p.catch(fail).then(function(){ $("#btnEvaluate").disabled=false; });
     });
   });
   function renderResult(rec){
     var host=$("#resultBody"); $("#resultCard").hidden=false; $("#resultCard").scrollIntoView({behavior:"smooth"});
-    if(rec.pending){ host.innerHTML='<div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p><b>'+esc(rec.teamName)+'</b> — submission saved. AI scoring isn\'t configured yet; the proctor can grade it once the AI endpoint is live.</p></div>'; return; }
+    if(rec.pending){ host.innerHTML='<div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p><b>'+esc(rec.teamName)+'</b> — submission saved. To score it, turn on AI in the <b>Proctor</b> tab: paste an Anthropic API key (quickest) or connect the worker. Then click Evaluate again.</p></div>'; return; }
     var html='<div class="total"><div class="n">'+rec.total+' <span style="font-size:20px;color:#9FB6CE">/ '+(rec.totalMax||TOTAL_MAX)+'</span></div><div class="l">'+esc(rec.teamName)+' · total across '+ (rec.perUseCase?rec.perUseCase.length:USECASES.length) +' use cases</div></div>';
     (rec.perUseCase||[]).forEach(function(u){ var pct=Math.round((u.score/100)*100); html+='<div class="uc"><div class="nm"><b>'+esc(u.title)+'</b><div class="bar"><i style="width:'+pct+'%"></i></div>'+(u.note?'<p>'+esc(u.note)+'</p>':'')+'</div><div class="sc">'+u.score+'<span style="font-size:12px;color:var(--ink-faint)">/100</span></div></div>'; });
     if(rec.rationale) html+='<div class="rationale"><b>Overall.</b> '+esc(rec.rationale)+'</div>';
