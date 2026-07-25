@@ -146,12 +146,18 @@
             </select>
           </label>
         </div>
+        <label class="field" style="margin-top:12px"><span>Quick AI — paste an Anthropic API key <span style="text-transform:none;letter-spacing:0;color:var(--ink-faint)">(no deploy needed; kept in this browser tab only)</span></span><input type="password" id="aiKey" placeholder="sk-ant-…" autocomplete="off"></label>
+        <div class="row"><button class="btn cyan sm" id="btnSaveAiKey" type="button">Use this key</button><button class="btn ghost sm" id="btnClearAiKey" type="button">Clear</button><span class="mono" id="keyStat" style="font-size:11px;color:var(--ink-faint)"></span></div>
         <div class="row" style="margin-top:12px">
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="aiOn" style="width:auto"> Enable AI evaluation</label>
-          <span id="aiStatus" class="pill off">AI endpoint not set</span>
+          <span id="aiStatus" class="pill off">AI not configured</span>
           <button class="btn ghost sm" id="aiTest" type="button">Test AI</button>
         </div>
         <div class="mono" id="aiMsg" style="font-size:11px;color:var(--ink-faint);margin-top:8px"></div>
+        <div class="note" style="display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--ink-soft);background:#F7F9FC;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;margin-top:10px">
+          <svg viewBox="0 0 24 24" width="16" height="16" style="flex:none;margin-top:1px;color:var(--cyan-deep)" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span><b>Two ways to turn on AI:</b> quickest is to paste your Anthropic API key above — works immediately, key stays in this tab only. For a shared/repeat event, deploy the worker instead so the key stays server-side (set <span class="mono">AI_EVAL_ENDPOINT</span> in firebase-config.js — see SETUP-HMF.md). If both are set, the worker is used.</span>
+        </div>
       </div>
     </div>
   </section>
@@ -267,20 +273,34 @@ function HMF_START(){
   $("#modelSel").addEventListener("change",saveConfig);
   $("#aiOn").addEventListener("change",saveConfig);
 
+  var ANTHROPIC="https://api.anthropic.com/v1/messages";
   function aiEndpoint(){ return window.AI_EVAL_ENDPOINT||""; }
+  function aiModel(){ return $("#modelSel").value||CFG.model||"claude-opus-4-8"; }
+  function aiKey(){ try{return sessionStorage.getItem("hmf:aikey")||"";}catch(e){return "";} }
+  function setAiKey(k){ try{ if(k)sessionStorage.setItem("hmf:aikey",k); else sessionStorage.removeItem("hmf:aikey"); }catch(e){} }
+  function aiReady(){ return !!aiEndpoint() || !!aiKey(); }
   function refreshAiStatus(){
     var s=$("#aiStatus");
-    if(aiEndpoint()){ s.className="pill ok"; s.textContent="AI endpoint set"; }
-    else { s.className="pill off"; s.textContent="AI endpoint not set"; }
+    if(aiEndpoint()){ s.className="pill ok"; s.textContent="AI worker connected"; }
+    else if(aiKey()){ s.className="pill ok"; s.textContent="AI key set (direct)"; }
+    else { s.className="pill off"; s.textContent="AI not configured"; }
+    if(aiKey())$("#keyStat").textContent="key active (this tab)";
   }
+  $("#btnSaveAiKey").addEventListener("click",function(){ var k=$("#aiKey").value.trim(); if(k&&k.indexOf("sk-")!==0){$("#keyStat").textContent="that doesn't look like an sk-ant-… key";return;} setAiKey(k); $("#aiKey").value=""; $("#keyStat").textContent=k?"key saved (this tab only)":"cleared"; refreshAiStatus(); });
+  $("#btnClearAiKey").addEventListener("click",function(){ setAiKey(""); $("#aiKey").value=""; $("#keyStat").textContent="cleared"; refreshAiStatus(); });
   $("#aiTest").addEventListener("click",function(){
-    var msg=$("#aiMsg"); var ep=aiEndpoint();
-    if(!ep){ msg.textContent="No AI endpoint configured — set window.AI_EVAL_ENDPOINT in firebase-config.js (see setup)."; return; }
-    msg.textContent="Testing…"; var t0=Date.now();
-    fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ping:true,model:CFG.model})})
-      .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,j:j}; }); })
-      .then(function(o){ msg.textContent=(o.ok?"AI endpoint OK":"Endpoint responded "+"("+ (o.j.model||CFG.model) +")")+" · "+(Date.now()-t0)+" ms"; })
-      .catch(function(e){ msg.textContent="AI endpoint error: "+e; });
+    var msg=$("#aiMsg"); var t0=Date.now();
+    if(aiEndpoint()){ msg.textContent="Testing…";
+      fetch(aiEndpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ping:true,model:aiModel()})})
+        .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,j:j}; }); })
+        .then(function(o){ msg.textContent=(o.ok?"AI worker OK":"responded "+"("+ (o.j.model||aiModel()) +")")+" · "+(Date.now()-t0)+" ms"; })
+        .catch(function(e){ msg.textContent="AI worker error: "+e; }); return; }
+    if(aiKey()){ msg.textContent="Testing key…";
+      fetch(ANTHROPIC,{method:"POST",headers:{"content-type":"application/json","x-api-key":aiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:aiModel(),max_tokens:8,messages:[{role:"user",content:"ping"}]})})
+        .then(function(r){return r.ok?{ok:true}:r.text().then(function(t){throw new Error(t.slice(0,120));});})
+        .then(function(){msg.textContent="AI key OK · "+(Date.now()-t0)+" ms";})
+        .catch(function(e){msg.textContent="key error: "+e.message;}); return; }
+    msg.textContent="No AI configured — paste a key above or set the worker endpoint.";
   });
 
   /* ---------- answer keys ---------- */
@@ -383,16 +403,61 @@ function HMF_START(){
     $("#modal").classList.remove("on");
   }
   function aiEvaluate(code,ucId,uc,fields){
-    var msg=$("#mAiMsg"); var ep=aiEndpoint();
-    if(!ep){ msg.textContent="No AI endpoint set (see setup)."; return; }
+    var msg=$("#mAiMsg");
+    if(!aiReady()){ msg.textContent="No AI configured — paste a key or set the worker in AI settings."; return; }
     msg.textContent="Evaluating…";
     var key=(KEYS[ucId]&&KEYS[ucId].text)?KEYS[ucId]:{text:DEFAULT_KEYS[ucId]||""};
-    var payload={ useCase:{id:ucId,title:uc.title}, response:[], answerKey:key, rubricMax:UC_MAX, model:CFG.model };
-    for(var i=1;i<=uc.concerns;i++){ var f=fields["c"+i]||{}; if((f.product&&f.product.trim())||(f.se&&f.se.trim())) payload.response.push({product:f.product||"",seResponse:f.se||""}); }
-    fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
-      .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
-      .then(function(res){ $("#mScore").value=clamp(res.total,0,UC_MAX); $("#mNote").value=res.rationale||""; msg.textContent="AI · "+(res.model||CFG.model)+" — review &amp; Save"; })
-      .catch(function(e){ msg.textContent="AI error: "+e; });
+    var response=[];
+    for(var i=1;i<=uc.concerns;i++){ var f=fields["c"+i]||{}; if((f.product&&f.product.trim())||(f.se&&f.se.trim())) response.push({product:f.product||"",seResponse:f.se||""}); }
+    var mdl=aiModel();
+    // Worker path (key stays server-side) takes precedence when configured.
+    if(aiEndpoint()){
+      var payload={ useCase:{id:ucId,title:uc.title}, response:response, answerKey:key, rubricMax:UC_MAX, model:mdl };
+      fetch(aiEndpoint(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+        .then(function(r){ return r.ok?r.json():r.text().then(function(t){throw new Error(t.slice(0,140));}); })
+        .then(function(res){ $("#mScore").value=clamp(res.total,0,UC_MAX); $("#mNote").value=res.rationale||""; msg.textContent="AI · "+(res.model||mdl)+" — review &amp; Save"; })
+        .catch(function(e){ msg.textContent="AI error: "+(e.message||e); });
+      return;
+    }
+    // Direct browser path (pasted key) — mirrors the worker's per-use-case scoring.
+    var req=scoreReq(uc,key,response,UC_MAX,mdl);
+    fetch(ANTHROPIC,{method:"POST",headers:{"content-type":"application/json","x-api-key":aiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify(req)})
+      .then(function(r){ return r.ok?r.json():r.text().then(function(t){throw new Error(t.slice(0,140));}); })
+      .then(function(data){ var out=parseScore(data,UC_MAX); $("#mScore").value=out.total; $("#mNote").value=out.rationale; msg.textContent="AI · "+mdl+" — review &amp; Save"; })
+      .catch(function(e){ msg.textContent="AI error: "+(e.message||e); });
+  }
+  /* Build the direct-Anthropic request for one use case (mirrors ai-eval-worker.js). */
+  function scoreReq(uc,key,response,max,mdl){
+    var system="You are an expert Cisco Solution-Engineering examiner grading a team's response in the Cedarline "+
+      "Hybrid Mesh Firewall (HMF) design clinic. For the given use case, the team answered each customer "+
+      "concern with a Product/platform and a Solution-Engineer response (how it addresses the concern and how "+
+      "it helps). Grade the WHOLE use-case response out of the maximum. Grade primarily against the proctor's "+
+      "reference answer key when one is provided; if none is provided, grade against sound Cisco Secure / HMF "+
+      "architecture practice. Reward: correct/appropriate products, and SE reasoning that is specific to "+
+      "Cedarline's stated constraints (encrypted-traffic compliance limits, ~10k-rule segmentation failures, "+
+      "two-engineer team, three cloud policy models, inherited rulebase). Do not reward blank, vague, or "+
+      "off-topic answers, or a product name with no reasoning. Always respond by calling submit_score.";
+    var lines=[];
+    lines.push("USE CASE: "+(uc.title||uc.id||"?"));
+    lines.push("MAXIMUM SCORE: "+max); lines.push("");
+    lines.push("=== PROCTOR REFERENCE ANSWER KEY ===");
+    lines.push((key&&key.text)?String(key.text):"(none provided — grade against sound Cisco Secure / HMF architecture practice)");
+    lines.push(""); lines.push("=== TEAM'S RESPONSE (grade this) ===");
+    if(!response.length) lines.push("(empty)");
+    response.forEach(function(r,i){ lines.push("Concern "+(i+1)+":"); lines.push("  Product/platform: "+(r.product||"—")); lines.push("  SE response: "+(r.seResponse||"—")); });
+    lines.push(""); lines.push("Grade the whole use-case response out of "+max+" and call submit_score.");
+    var tool={ name:"submit_score", description:"Return the integer score (0.."+max+") for this use-case response and a short rationale.",
+      input_schema:{ type:"object", properties:{
+        score:{type:"integer",minimum:0,maximum:max,description:"Overall score for the use case, 0.."+max+"."},
+        rationale:{type:"string",description:"2-4 sentences: what was strong, what was missing or generic, per concern."}
+      }, required:["score","rationale"] } };
+    return { model:mdl, max_tokens:1024, system:system, tools:[tool], tool_choice:{type:"tool",name:"submit_score"},
+      messages:[{role:"user",content:[{type:"text",text:lines.join("\n")}]}] };
+  }
+  function parseScore(data,max){
+    var use=(data.content||[]).find(function(b){return b.type==="tool_use";});
+    if(!use||!use.input) throw new Error("model returned no structured score");
+    return { total:clamp(use.input.score,0,max), rationale:String(use.input.rationale||"") };
   }
   $("#mClose").addEventListener("click",function(){ $("#modal").classList.remove("on"); });
   $("#modal").addEventListener("click",function(e){ if(e.target===this) this.classList.remove("on"); });
