@@ -27,12 +27,12 @@
    ========================================================================== */
 
 window.FIREBASE_CONFIG = {
-  apiKey:            "PASTE_API_KEY",
-  authDomain:        "PASTE_PROJECT.firebaseapp.com",
-  projectId:         "PASTE_PROJECT",
-  storageBucket:     "PASTE_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId:             "PASTE_APP_ID"
+  apiKey:            "AIzaSyClx2RuQW5yl2rBxrov4jZDWcwiBoJoZyA",
+  authDomain:        "hmf-clinic-b9258.firebaseapp.com",
+  projectId:         "hmf-clinic-b9258",
+  storageBucket:     "hmf-clinic-b9258.firebasestorage.app",
+  messagingSenderId: "676644117052",
+  appId:             "1:676644117052:web:b5ba3c913271363a228139"
 };
 
 /* AI evaluation endpoint (your deployed worker). Empty = AI scoring stays off
