@@ -7,4 +7,6 @@ Same materials as the Word pack, as PDFs that print cleanly on any device.
 - **HMF-Proctor-Scoring-Sheet.pdf** — proctor. One landscape page: all teams ×
   four use cases, totals /400, scoring bands.
 - **HMF-Proctor-Guide.pdf** — proctor. Reference answers per use case + bands.
+- **HMF-Proctor-Cheat-Sheet.pdf** — proctor. One landscape page: all four use
+  cases' answers (products + full-marks reasoning) and the scoring bands, at a glance.
 - **HMF-Activity-Guide.pdf** — optional one-page overview.
