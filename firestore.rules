@@ -1,0 +1,48 @@
+rules_version = '2';
+// HMF Design Clinic — Firestore security rules.
+// Paste into Firebase Console → Firestore → Rules → Publish.
+// Reads are open (facilitated clinic); writes are shape-validated; client deletes
+// are blocked. Delete a cohort's data from the console after the session.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Team registration: name + members
+    match /teams/{id} {
+      allow read: if true;
+      allow create, update: if
+        request.resource.data.teamName is string &&
+        request.resource.data.teamName.size() < 120;
+      allow delete: if false;
+    }
+
+    // Per-team, per-use-case answer sheets (shared auto-sync)
+    match /answers/{id} {
+      allow read: if true;
+      allow create, update: if request.resource.data.fields is map;
+      allow delete: if false;
+    }
+
+    // Per-team scores + submission state (proctor reads these)
+    match /scores/{id} {
+      allow read: if true;
+      allow create, update: if
+        request.resource.data.teamName is string &&
+        request.resource.data.total is number;
+      allow delete: if false;
+    }
+
+    // Proctor-authored answer keys per use case
+    match /answerkeys/{id} {
+      allow read: if true;
+      allow create, update: if request.resource.data.text is string;
+      allow delete: if false;
+    }
+
+    // Per-event config (model + AI on/off)
+    match /config/{id} {
+      allow read: if true;
+      allow create, update: if request.resource.data.model is string;
+      allow delete: if false;
+    }
+  }
+}

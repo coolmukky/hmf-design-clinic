@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMF Design Clinic — Proctor Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F6FA;--surface:#FFFFFF;--ink:#0E1A2B;--ink-soft:#46566E;--ink-faint:#7E8CA1;
+    --line:#CBD5E3;--line-soft:#E1E8F1;--navy:#0D274D;--navy-deep:#041E42;
+    --cyan:#00BCEB;--cyan-deep:#036C8F;--amber:#E2891F;--red:#DB4A4A;--green:#27A276;
+    --green-soft:#D7F0E6;--amber-soft:#FBEBD3;--red-soft:#FBE2E2;
+    --shadow:0 1px 0 rgba(14,26,43,.04),0 18px 40px -28px rgba(14,26,43,.55);--radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:"Chakra Petch",sans-serif;margin:0;line-height:1.12;letter-spacing:-.01em}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  a{color:var(--cyan-deep)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan-deep)}
+
+  .topbar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#0c1d34,#0a1830);border-bottom:2px solid var(--cyan);color:#EAF1F8}
+  .topbar-in{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;line-height:1.15}
+  .brand b{font-family:"Chakra Petch";font-size:15px;color:#fff}
+  .brand small{font-family:"IBM Plex Mono";font-size:10px;letter-spacing:.12em;color:#7FE2EF;text-transform:uppercase}
+  .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .roombox{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:4px 6px 4px 10px}
+  .roombox label{font-family:"IBM Plex Mono";font-size:10px;letter-spacing:.1em;color:#9FB6CE;text-transform:uppercase}
+  .roombox input{width:110px;background:transparent;border:none;color:#fff;font-family:"IBM Plex Mono";font-size:13px;text-transform:uppercase;outline:none}
+  .tb-sync{font-family:"IBM Plex Mono";font-size:10px;display:inline-flex;align-items:center;gap:6px;color:#9FB6CE}
+  .tb-sync i{width:8px;height:8px;border-radius:50%;background:#8593A6;display:inline-block}
+  .tb-sync.live i{background:var(--green);box-shadow:0 0 0 3px rgba(39,162,118,.25)}
+
+  .sec{padding:26px 0 6px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .sec-head h2{font-size:20px;font-weight:700}
+  .sec-head .hint{font-size:12.5px;color:var(--ink-soft)}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  .btn{font-family:"IBM Plex Sans";font-weight:600;font-size:13px;border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:9px;padding:9px 15px;cursor:pointer;transition:background .15s,transform .05s;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:#12315e}.btn:active{transform:translateY(1px)}
+  .btn.cyan{background:var(--cyan-deep);border-color:var(--cyan-deep)}.btn.cyan:hover{background:#02566f}
+  .btn.green{background:var(--green);border-color:var(--green)}.btn.green:hover{background:#22916a}
+  .btn.ghost{background:transparent;color:var(--navy);border-color:var(--line)}.btn.ghost:hover{background:#EEF3F9}
+  .btn.sm{font-size:12px;padding:6px 11px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  label.field{display:block;margin-bottom:10px}
+  label.field span{display:block;font-family:"IBM Plex Mono";font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan-deep);margin-bottom:4px}
+  input[type=text],input[type=password],textarea,select{width:100%;font-family:"IBM Plex Sans";font-size:13.5px;color:var(--ink);background:#FBFDFF;border:1px solid var(--line);border-radius:8px;padding:9px 11px;outline:none}
+  textarea{resize:vertical;min-height:64px;line-height:1.5;font-size:13px}
+  input:focus,textarea:focus,select:focus{border-color:var(--cyan-deep);box-shadow:0 0 0 3px rgba(3,108,143,.12)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  .pill{font-family:"IBM Plex Mono";font-size:11px;border-radius:20px;padding:3px 10px;display:inline-flex;align-items:center;gap:5px}
+  .pill.ok{background:var(--green-soft);color:#155c43;border:1px solid #A9DEC9}
+  .pill.warn{background:var(--amber-soft);color:#8a560f;border:1px solid #F0CE97}
+  .pill.off{background:#EEF3F9;color:var(--ink-faint);border:1px solid var(--line)}
+
+  /* answer keys */
+  .keys{display:grid;gap:10px}
+  .keyc{border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .keyc summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:10px;background:#F7F9FC}
+  .keyc summary::-webkit-details-marker{display:none}
+  .keyc .kn{font-family:"Chakra Petch";font-weight:700;font-size:13px;color:#fff;background:var(--cyan-deep);width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+  .keyc .kt{font-weight:600;font-size:14px}
+  .keyc .kstat{margin-left:auto}
+  .keyc .kbody{padding:12px 14px}
+  .keyc .kbody .lb{font-size:12px;color:var(--ink-soft);margin-bottom:8px}
+
+  /* teams */
+  .team{border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;background:var(--surface)}
+  .team-top{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+  .team-top .tn{font-family:"Chakra Petch";font-weight:700;font-size:17px}
+  .team-top .code{font-family:"IBM Plex Mono";font-size:11px;background:#EEF3F9;border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--ink-soft)}
+  .team-top .mem{font-size:12.5px;color:var(--ink-soft)}
+  .team-top .total{margin-left:auto;font-family:"Chakra Petch";font-weight:700;font-size:22px;color:var(--cyan-deep)}
+  .team-top .total small{font-family:"IBM Plex Mono";font-size:11px;color:var(--ink-faint);font-weight:400}
+  .ucrow{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .ucc{padding:12px 14px;border-right:1px solid var(--line-soft)}
+  .ucc:last-child{border-right:none}
+  .ucc .un{font-family:"IBM Plex Mono";font-size:10px;color:var(--ink-faint);letter-spacing:.05em}
+  .ucc h4{font-size:13px;margin:3px 0 7px}
+  .ucc .st{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ucc .sc{font-family:"Chakra Petch";font-weight:700;font-size:18px}
+  .ucc .sc.none{color:var(--ink-faint)}
+  .ucc .view{font-family:"IBM Plex Mono";font-size:11px;color:var(--cyan-deep);cursor:pointer;background:none;border:none;padding:0;text-decoration:underline}
+
+  .empty{text-align:center;color:var(--ink-faint);padding:40px 20px;font-size:14px}
+
+  /* modal */
+  .modal{position:fixed;inset:0;z-index:100;background:rgba(6,16,30,.55);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+  .modal.on{display:flex}
+  .modal-in{background:var(--surface);border-radius:16px;max-width:720px;width:100%;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+  .modal-h{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line-soft)}
+  .modal-h h3{font-size:17px}
+  .modal-h .x{margin-left:auto;background:none;border:none;font-size:24px;color:var(--ink-faint);cursor:pointer;line-height:1}
+  .modal-b{padding:18px 20px}
+  .qa{border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+  .qa .q{font-size:13px;font-style:italic;color:var(--ink-soft);margin-bottom:8px}
+  .qa .p{font-size:13px}.qa .p b{color:var(--cyan-deep)}
+  .qa .se{font-size:13px;color:var(--ink);margin-top:4px}
+  .scorebox{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .scorebox input{width:90px}
+
+  .foot{margin:34px 0;padding-top:16px;border-top:1px solid var(--line);font-family:"IBM Plex Mono";font-size:11px;color:var(--ink-faint);text-align:center}
+  @media (max-width:720px){.grid2{grid-template-columns:1fr}.ucrow{grid-template-columns:1fr 1fr}.ucc:nth-child(2n){border-right:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand"><b>HMF Proctor Console</b><small>Cedarline Design Clinic</small></div>
+    <div class="tb-right">
+      <span class="tb-sync" id="syncBadge"><i></i><span id="syncLabel">This device</span></span>
+      <div class="roombox"><label>Event</label><input type="text" id="roomInput" maxlength="12" placeholder="CODE"><button class="btn sm cyan" id="roomSet" type="button">Set</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== EVENT CONFIG ===== -->
+  <section class="sec">
+    <div class="sec-head"><h2>Event &amp; AI settings</h2><span class="hint">Scoped to event <b id="roomLabel" class="mono">default</b>. Share the participant link with this event code.</span></div>
+    <div class="grid2">
+      <div class="card">
+        <label class="field"><span>Participant join link</span><input type="text" id="joinLink" readonly></label>
+        <div class="row"><button class="btn ghost sm" id="copyLink" type="button">Copy link</button><span class="mono" style="font-size:11px;color:var(--ink-faint)">participants enter this event's code when they join</span></div>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <label class="field" style="flex:1;margin-bottom:0"><span>AI evaluation model</span>
+            <select id="modelSel">
+              <option value="claude-opus-4-8">Claude Opus 4.8 — most capable</option>
+              <option value="claude-sonnet-5">Claude Sonnet 5 — balanced</option>
+              <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — fastest</option>
+            </select>
+          </label>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="aiOn" style="width:auto"> Enable AI evaluation</label>
+          <span id="aiStatus" class="pill off">AI endpoint not set</span>
+          <button class="btn ghost sm" id="aiTest" type="button">Test AI</button>
+        </div>
+        <div class="mono" id="aiMsg" style="font-size:11px;color:var(--ink-faint);margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ANSWER KEYS ===== -->
+  <section class="sec">
+    <div class="sec-head"><h2>Answer keys</h2><span class="hint">The reference answer for each use case. The AI grades team submissions against these. Saved per event.</span></div>
+    <div class="keys" id="keyList"></div>
+  </section>
+
+  <!-- ===== TEAMS ===== -->
+  <section class="sec">
+    <div class="sec-head"><h2>Teams &amp; scores</h2><span class="hint" id="teamCount">—</span>
+      <button class="btn ghost sm" id="exportCsv" type="button" style="margin-left:auto">Export CSV</button>
+    </div>
+    <div id="teamList"></div>
+  </section>
+
+  <div class="foot">HMF Design Clinic · Proctor console · scores &amp; submissions are stored per event</div>
+</div>
+
+<!-- response / evaluate modal -->
+<div class="modal" id="modal">
+  <div class="modal-in">
+    <div class="modal-h"><h3 id="mTitle">Response</h3><button class="x" id="mClose" type="button">&times;</button></div>
+    <div class="modal-b" id="mBody"></div>
+  </div>
+</div>
+
+<!-- Optional backend: cross-device shared sync + AI scoring. Safe to omit — the console falls back to single-device mode. -->
+<script src="firebase-config.js"></script>
+<script>
+function HMF_START(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+  var USECASES=[
+    {id:"ai-security",title:"AI Security",concerns:2},
+    {id:"cloud-edge",title:"Cloud Edge",concerns:2},
+    {id:"dc-edge",title:"DC Edge · Perimeter Firewall",concerns:2},
+    {id:"segmentation",title:"Macro & Micro Segmentation",concerns:2}
+  ];
+  var UC_MAX=100;
+
+  var params=new URLSearchParams(location.search);
+  var ROOM=(params.get("room")||localStorage.getItem("hmf:proctor:lastRoom")||"default").toUpperCase();
+
+  /* ---------- storage: local or cloud adapter ---------- */
+  var CLOUD=window.HMF_CLOUD||null;
+  var bc=("BroadcastChannel" in window)?new BroadcastChannel("hmf-sync"):null;
+  function lsKey(p){return "hmf:"+p;}
+  var Store={
+    write:function(path,obj){
+      if(CLOUD){ try{CLOUD.write(path,obj);}catch(e){console.warn(e);} return; }
+      try{ localStorage.setItem(lsKey(path),JSON.stringify(obj)); }catch(e){}
+      if(bc) bc.postMessage({path:path});
+    },
+    read:function(path){
+      if(CLOUD) return CLOUD.read(path);
+      try{ var v=localStorage.getItem(lsKey(path)); return Promise.resolve(v?JSON.parse(v):null); }catch(e){ return Promise.resolve(null); }
+    },
+    watch:function(path,cb){
+      if(CLOUD) return CLOUD.watch(path,cb);
+      this.read(path).then(cb);
+      if(bc) bc.addEventListener("message",function(e){ if(e.data&&e.data.path===path) Store.read(path).then(cb); });
+      window.addEventListener("storage",function(e){ if(e.key===lsKey(path)) Store.read(path).then(cb); });
+      return function(){};
+    },
+    // list docs whose path starts with prefix -> [{path,data}]
+    watchCollection:function(prefix,cb){
+      if(CLOUD) return CLOUD.watchCollection(prefix,cb);
+      var scan=function(){
+        var out=[];
+        for(var i=0;i<localStorage.length;i++){
+          var k=localStorage.key(i);
+          if(k.indexOf(lsKey(prefix))===0){
+            try{ out.push({path:k.slice(4), data:JSON.parse(localStorage.getItem(k))}); }catch(e){}
+          }
+        }
+        cb(out);
+      };
+      scan();
+      if(bc) bc.addEventListener("message",function(e){ if(e.data&&e.data.path&&e.data.path.indexOf(prefix)===0) scan(); });
+      window.addEventListener("storage",function(e){ if(e.key&&e.key.indexOf(lsKey(prefix))===0) scan(); });
+      return function(){};
+    }
+  };
+
+  function keyPath(ucId){ return "answerkeys/"+ROOM+"__"+ucId; }
+  function configPath(){ return "config/"+ROOM; }
+  function scoresPrefix(){ return "scores/"+ROOM+"__"; }
+  function ansPath(code,ucId){ return "answers/"+ROOM+"__"+code+"__"+ucId; }
+
+  /* ---------- sync badge / room ---------- */
+  function setSync(){ var b=$("#syncBadge"),l=$("#syncLabel"); if(CLOUD){b.classList.add("live");l.textContent="Live · shared";}else{b.classList.remove("live");l.textContent="This device";} }
+  function applyRoom(){
+    $("#roomInput").value=ROOM; $("#roomLabel").textContent=ROOM;
+    localStorage.setItem("hmf:proctor:lastRoom",ROOM);
+    var base=location.href.split("?")[0].replace(/proctor\.html$/,"index.html");
+    $("#joinLink").value=base+"?room="+encodeURIComponent(ROOM);
+  }
+  $("#roomSet").addEventListener("click",function(){ var v=$("#roomInput").value.trim().toUpperCase(); if(v){ location.search="?room="+encodeURIComponent(v); } });
+  $("#roomInput").addEventListener("keydown",function(e){ if(e.key==="Enter") $("#roomSet").click(); });
+  $("#copyLink").addEventListener("click",function(){ $("#joinLink").select(); try{document.execCommand("copy");}catch(e){} this.textContent="Copied ✓"; var t=this; setTimeout(function(){t.textContent="Copy link";},1400); });
+
+  /* ---------- config (model + AI on) ---------- */
+  var CFG={model:"claude-opus-4-8",aiOn:false};
+  function loadConfig(){
+    Store.watch(configPath(),function(c){ if(c){ CFG=Object.assign(CFG,c); $("#modelSel").value=CFG.model||"claude-opus-4-8"; $("#aiOn").checked=!!CFG.aiOn; } });
+  }
+  function saveConfig(){ CFG.model=$("#modelSel").value; CFG.aiOn=$("#aiOn").checked; Store.write(configPath(),CFG); }
+  $("#modelSel").addEventListener("change",saveConfig);
+  $("#aiOn").addEventListener("change",saveConfig);
+
+  function aiEndpoint(){ return window.AI_EVAL_ENDPOINT||""; }
+  function refreshAiStatus(){
+    var s=$("#aiStatus");
+    if(aiEndpoint()){ s.className="pill ok"; s.textContent="AI endpoint set"; }
+    else { s.className="pill off"; s.textContent="AI endpoint not set"; }
+  }
+  $("#aiTest").addEventListener("click",function(){
+    var msg=$("#aiMsg"); var ep=aiEndpoint();
+    if(!ep){ msg.textContent="No AI endpoint configured — set window.AI_EVAL_ENDPOINT in firebase-config.js (see setup)."; return; }
+    msg.textContent="Testing…"; var t0=Date.now();
+    fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ping:true,model:CFG.model})})
+      .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,j:j}; }); })
+      .then(function(o){ msg.textContent=(o.ok?"AI endpoint OK":"Endpoint responded "+"("+ (o.j.model||CFG.model) +")")+" · "+(Date.now()-t0)+" ms"; })
+      .catch(function(e){ msg.textContent="AI endpoint error: "+e; });
+  });
+
+  /* ---------- answer keys ---------- */
+  var KEYS={};
+  function renderKeys(){
+    var host=$("#keyList"); host.innerHTML="";
+    USECASES.forEach(function(uc,i){
+      var d=document.createElement("details"); d.className="keyc";
+      var filled=KEYS[uc.id]&&KEYS[uc.id].text&&KEYS[uc.id].text.trim();
+      d.innerHTML='<summary><span class="kn">'+(i+1)+'</span><span class="kt">'+uc.title+'</span>'+
+        '<span class="kstat">'+(filled?'<span class="pill ok">key saved</span>':'<span class="pill warn">no key yet</span>')+'</span></summary>'+
+        '<div class="kbody"><div class="lb">Reference answer / grading notes — expected products &amp; the SE reasoning that earns full marks. The AI grades against this.</div>'+
+        '<textarea id="key-'+uc.id+'" placeholder="e.g. Concern 1 → Cisco Secure Firewall + Encrypted Visibility Engine: detects threats in encrypted traffic without decryption… Concern 2 → …">'+esc(filled?KEYS[uc.id].text:"")+'</textarea>'+
+        '<div class="row" style="margin-top:10px"><button class="btn green sm" data-save="'+uc.id+'" type="button">Save key</button><span class="mono" style="font-size:11px;color:var(--ink-faint)" id="ksaved-'+uc.id+'"></span></div></div>';
+      host.appendChild(d);
+    });
+    $$("#keyList [data-save]").forEach(function(b){
+      b.addEventListener("click",function(){
+        var id=b.getAttribute("data-save"); var txt=$("#key-"+id).value;
+        KEYS[id]={text:txt,updatedAt:Date.now()};
+        Store.write(keyPath(id),KEYS[id]);
+        $("#ksaved-"+id).textContent="saved ✓"; setTimeout(function(){var el=$("#ksaved-"+id);if(el)el.textContent="";},1400);
+      });
+    });
+  }
+  function watchKeys(){ USECASES.forEach(function(uc){ Store.watch(keyPath(uc.id),function(k){ if(k){KEYS[uc.id]=k; var ta=$("#key-"+uc.id); if(ta&&document.activeElement!==ta){ta.value=k.text||"";}}}); }); }
+
+  /* ---------- teams ---------- */
+  var TEAMS={}; // code -> scores doc
+  function watchTeams(){
+    Store.watchCollection(scoresPrefix(),function(list){
+      TEAMS={};
+      list.forEach(function(item){
+        var code=item.path.split("__").pop();
+        TEAMS[code]=item.data;
+      });
+      renderTeams();
+    });
+  }
+  function teamTotal(t){ var s=0; USECASES.forEach(function(uc){ var x=t.byUc&&t.byUc[uc.id]; if(x&&typeof x.total==="number") s+=x.total; }); return s; }
+
+  function renderTeams(){
+    var host=$("#teamList"); var codes=Object.keys(TEAMS);
+    $("#teamCount").textContent=codes.length+" team"+(codes.length===1?"":"s");
+    if(!codes.length){ host.innerHTML='<div class="card empty">No teams yet for event <b class="mono">'+ROOM+'</b>. Share the join link — teams appear here as they register and submit.</div>'; return; }
+    // sort by total desc
+    codes.sort(function(a,b){ return teamTotal(TEAMS[b])-teamTotal(TEAMS[a]); });
+    host.innerHTML="";
+    codes.forEach(function(code){
+      var t=TEAMS[code];
+      var el=document.createElement("div"); el.className="team";
+      var members=(t.members||[]).join(", ")||"—";
+      var html='<div class="team-top"><span class="tn">'+esc(t.teamName||"(unnamed)")+'</span><span class="code">'+esc(code)+'</span>'+
+        '<span class="mem">'+esc(members)+'</span><span class="total">'+teamTotal(t)+'<small> / '+(USECASES.length*UC_MAX)+'</small></span></div><div class="ucrow">';
+      USECASES.forEach(function(uc,i){
+        var sc=t.byUc&&t.byUc[uc.id]; var submitted=t.submitted&&t.submitted[uc.id];
+        var scoreHtml;
+        if(sc&&typeof sc.total==="number") scoreHtml='<span class="sc">'+sc.total+'<small class="mono" style="font-size:10px;color:var(--ink-faint)">/'+UC_MAX+'</small></span>';
+        else scoreHtml='<span class="sc none">—</span>';
+        var stat = submitted? (sc&&typeof sc.total==="number"?'<span class="pill ok">'+(sc.method==="ai"?"AI":"scored")+'</span>':'<span class="pill warn">to score</span>') : '<span class="pill off">not submitted</span>';
+        html+='<div class="ucc"><div class="un">UC '+(i+1)+'</div><h4>'+uc.title.replace(" · Perimeter Firewall","")+'</h4><div class="st">'+scoreHtml+stat+
+          (submitted?'<button class="view" data-code="'+code+'" data-uc="'+uc.id+'">view / score</button>':'')+'</div></div>';
+      });
+      html+='</div>';
+      el.innerHTML=html; host.appendChild(el);
+    });
+    $$("#teamList .view").forEach(function(b){ b.addEventListener("click",function(){ openEval(b.getAttribute("data-code"),b.getAttribute("data-uc")); }); });
+  }
+
+  /* ---------- evaluate modal ---------- */
+  function openEval(code,ucId){
+    var uc=USECASES.find(function(u){return u.id===ucId;}); var t=TEAMS[code];
+    $("#mTitle").textContent=(t.teamName||code)+" · "+uc.title;
+    var body=$("#mBody"); body.innerHTML='<div class="mono" style="font-size:12px;color:var(--ink-faint)">Loading response…</div>';
+    Store.read(ansPath(code,ucId)).then(function(a){
+      var fields=(a&&a.fields)||{};
+      var html="";
+      for(var i=1;i<=uc.concerns;i++){
+        var f=fields["c"+i]||{product:"",se:""};
+        html+='<div class="qa"><div class="q">Concern '+i+'</div><div class="p"><b>Product:</b> '+esc(f.product||"—")+'</div><div class="se">'+esc(f.se||"—")+'</div></div>';
+      }
+      var cur=(t.byUc&&t.byUc[ucId])||{};
+      html+='<div class="row" style="margin-top:6px"><button class="btn cyan sm" id="mAi" type="button">Evaluate with AI</button><span class="mono" id="mAiMsg" style="font-size:11px;color:var(--ink-faint)"></span></div>';
+      html+='<div class="scorebox"><label class="field" style="margin:0"><span>Score (0–'+UC_MAX+')</span><input type="text" id="mScore" value="'+(typeof cur.total==="number"?cur.total:"")+'"></label>'+
+        '<label class="field" style="margin:0;flex:1"><span>Rationale / notes</span><input type="text" id="mNote" value="'+escAttr(cur.rationale||"")+'"></label></div>';
+      html+='<div class="row" style="margin-top:12px"><button class="btn green sm" id="mSave" type="button">Save score</button></div>';
+      body.innerHTML=html;
+      $("#mSave").addEventListener("click",function(){ saveScore(code,ucId); });
+      $("#mAi").addEventListener("click",function(){ aiEvaluate(code,ucId,uc,fields); });
+    });
+    $("#modal").classList.add("on");
+  }
+  function saveScore(code,ucId){
+    var t=TEAMS[code]; var sc=clamp($("#mScore").value,0,UC_MAX); var note=$("#mNote").value;
+    t.byUc=t.byUc||{}; t.byUc[ucId]={total:sc,rationale:note,method:t.byUc[ucId]&&t.byUc[ucId].method==="ai"?"ai":"manual",model:t.byUc[ucId]&&t.byUc[ucId].model,at:Date.now()};
+    t.total=teamTotal(t);
+    Store.write("scores/"+ROOM+"__"+code,t);
+    $("#modal").classList.remove("on");
+  }
+  function aiEvaluate(code,ucId,uc,fields){
+    var msg=$("#mAiMsg"); var ep=aiEndpoint();
+    if(!ep){ msg.textContent="No AI endpoint set (see setup)."; return; }
+    msg.textContent="Evaluating…";
+    var payload={ useCase:{id:ucId,title:uc.title}, response:[], answerKey:KEYS[ucId]||null, rubricMax:UC_MAX, model:CFG.model };
+    for(var i=1;i<=uc.concerns;i++){ var f=fields["c"+i]||{}; payload.response.push({product:f.product||"",seResponse:f.se||""}); }
+    fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+      .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
+      .then(function(res){ $("#mScore").value=clamp(res.total,0,UC_MAX); $("#mNote").value=res.rationale||""; msg.textContent="AI · "+(res.model||CFG.model)+" — review &amp; Save"; })
+      .catch(function(e){ msg.textContent="AI error: "+e; });
+  }
+  $("#mClose").addEventListener("click",function(){ $("#modal").classList.remove("on"); });
+  $("#modal").addEventListener("click",function(e){ if(e.target===this) this.classList.remove("on"); });
+
+  /* ---------- CSV ---------- */
+  $("#exportCsv").addEventListener("click",function(){
+    var rows=[["team","code","members","uc1","uc2","uc3","uc4","total"]];
+    Object.keys(TEAMS).forEach(function(code){
+      var t=TEAMS[code]; var r=[t.teamName||"",code,(t.members||[]).join("; ")];
+      USECASES.forEach(function(uc){ var x=t.byUc&&t.byUc[uc.id]; r.push(x&&typeof x.total==="number"?x.total:""); });
+      r.push(teamTotal(t)); rows.push(r);
+    });
+    var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+    var a=document.createElement("a"); a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+    a.download="hmf-"+ROOM+"-scores.csv"; a.click();
+  });
+
+  /* ---------- helpers ---------- */
+  function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
+  function clamp(n,a,b){n=Number(n);if(isNaN(n))return 0;return Math.max(a,Math.min(b,Math.round(n)));}
+
+  /* ---------- init ---------- */
+  setSync(); applyRoom(); refreshAiStatus();
+  renderKeys(); watchKeys(); loadConfig(); watchTeams();
+}
+/* Boot: wait for the backend adapter only when firebase-config.js says one is
+   coming; otherwise start immediately in single-device mode. */
+(function(){
+  if(window.HMF_CLOUD){ HMF_START(); return; }
+  if(window.HMF_CLOUD_PENDING){
+    var started=false, go=function(){ if(started) return; started=true; HMF_START(); };
+    window.HMF_ON_CLOUD=go;
+    setTimeout(go,4000);
+  } else {
+    HMF_START();
+  }
+})();
+</script>
+</body>
+</html>
