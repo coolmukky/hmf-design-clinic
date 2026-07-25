@@ -27,12 +27,12 @@
    ========================================================================== */
 
 window.FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyClx2RuQW5yl2rBxrov4jZDWcwiBoJoZyA",
-  authDomain:        "hmf-clinic-b9258.firebaseapp.com",
-  projectId:         "hmf-clinic-b9258",
-  storageBucket:     "hmf-clinic-b9258.firebasestorage.app",
-  messagingSenderId: "676644117052",
-  appId:             "1:676644117052:web:b5ba3c913271363a228139"
+  apiKey:            "AIzaSyBy_9LerhRZmQjgHFJnntfJ63Ni309FJvE",
+  authDomain:        "hmf-clinic-80732.firebaseapp.com",
+  projectId:         "hmf-clinic-80732",
+  storageBucket:     "hmf-clinic-80732.firebasestorage.app",
+  messagingSenderId: "737891704975",
+  appId:             "1:737891704975:web:670ab9e8f6d44fa1e350fa"
 };
 
 /* AI evaluation endpoint (your deployed worker). Empty = AI scoring stays off
