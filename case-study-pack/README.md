@@ -4,7 +4,8 @@ A fresh, print-ready offline set built from the aligned use-case sheet. The four
 use cases are presented as **Case Study 1–4**, each with **four pain points** for
 teams to work. Same activity, no infrastructure needed.
 
-**PDFs are in `pdf/`** — the recommended, verified-good-looking format for printing.
+**PDFs are in `pdf/`** — the recommended, verified format for printing.
+**Editable Word versions are in `docx/`** — same layout with large answer boxes; edit wording as needed.
 
 | Document | For | What it is |
 |---|---|---|
