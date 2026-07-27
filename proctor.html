@@ -164,7 +164,7 @@
 
   <!-- ===== ANSWER KEYS ===== -->
   <section class="sec">
-    <div class="sec-head"><h2>Answer keys</h2><span class="hint">The reference answer for each use case. The AI grades team submissions against these. Saved per event.</span></div>
+    <div class="sec-head"><h2>Answer keys</h2><span class="hint">The reference answer for each case study. The AI grades team submissions against these. Saved per event.</span></div>
     <div class="keys" id="keyList"></div>
   </section>
 
@@ -363,7 +363,7 @@ function HMF_START(){
         if(sc&&typeof sc.total==="number") scoreHtml='<span class="sc">'+sc.total+'<small class="mono" style="font-size:10px;color:var(--ink-faint)">/'+UC_MAX+'</small></span>';
         else scoreHtml='<span class="sc none">—</span>';
         var stat = submitted? (sc&&typeof sc.total==="number"?'<span class="pill ok">'+(sc.method==="ai"?"AI":"scored")+'</span>':'<span class="pill warn">to score</span>') : '<span class="pill off">not submitted</span>';
-        html+='<div class="ucc"><div class="un">UC '+(i+1)+'</div><h4>'+uc.title.replace(" · Perimeter Firewall","")+'</h4><div class="st">'+scoreHtml+stat+
+        html+='<div class="ucc"><div class="un">CS '+(i+1)+'</div><h4>'+uc.title.replace(" · Perimeter Firewall","")+'</h4><div class="st">'+scoreHtml+stat+
           (submitted?'<button class="view" data-code="'+code+'" data-uc="'+uc.id+'">view / score</button>':'')+'</div></div>';
       });
       html+='</div>';

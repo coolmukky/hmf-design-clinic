@@ -40,15 +40,17 @@ response**. Answers are scored (0–100 per use case, **400 total**).
 
 ---
 
-## The four use cases
+## The four case studies
 
-1. **AI Security** — signature-based detection misses unknown attacks; most traffic is encrypted and can't be decrypted for compliance.
-2. **Cloud Edge** — AWS + Azure + GCP, three policy models; nobody can report posture across all three.
-3. **DC Edge · Perimeter Firewall** — mixed-vendor estate, three consoles, weeks-long backlog, an inherited rulebase, two engineers.
-4. **Macro & Micro Segmentation** — flat data centre, east-west lateral movement; segmentation died three times on ~10,000 hand-written rules.
+Each case study has **four customer pain points** (16 total, from the aligned sheet):
 
-Each use case is scored out of 100 → **400 total**. Grading rewards naming the
-right product **and** Solution-Engineer reasoning that is specific to Cedarline.
+1. **AI Security** — compliance evidence, supply-chain vetting, AI cloud visibility, and runtime guardrails.
+2. **Cloud Edge** — contain lateral movement, prove consistent controls, one policy plane across AWS/Azure/on-prem.
+3. **DC Edge · Perimeter Firewall** — rapid isolation, restore visibility into encrypted traffic, modernise detection.
+4. **Macro & Micro Segmentation** — safe segmentation with runtime visibility and application-dependency awareness.
+
+Each case study is scored out of 100 (25 per pain point) → **400 total**. Grading
+rewards naming the right product **and** Solution-Engineer reasoning specific to Cedarline.
 
 ---
 
