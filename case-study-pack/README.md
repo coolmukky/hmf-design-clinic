@@ -11,6 +11,7 @@ teams to work. Same activity, no infrastructure needed.
 |---|---|---|
 | `HMF-Team-Workbook.pdf` | Each team | Cover + Cedarline scenario, **Case Study 1–4** (four pain points each) with large, clearly-ruled answer spaces for **Product / Platform** and the **Solution-Engineer response**, and a **full-page space at the end to paste the team's topology diagram**. |
 | `HMF-Proctor-Guide.pdf` | Proctor | Reference answers for all 16 pain points — expected product/platform, a model SE response, and how it helps — plus the 0–100 scoring bands. |
+| `HMF-Proctor-Grading-Guide.pdf` | Proctor | **Level-based grading rubric** — Associate / Professional / Expert. Master rubric, step-by-step guidelines, the expected answer at each level for all 16 pain points, per-pain-point score lines, per-Case-Study feedback boxes (did well / improve), and a score summary (/400 + overall level). |
 | `HMF-Proctor-Cheat-Sheet.pdf` | Proctor | One at-a-glance landscape table: every pain point → expected product → key SE reasoning, with fast-scoring guidance. |
 | `HMF-Activity-Guide.pdf` | Everyone | One-page overview — scenario, roles, the four Case Studies, how to run it, and scoring. |
 
