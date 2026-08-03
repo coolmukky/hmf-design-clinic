@@ -4,7 +4,7 @@ A print-ready, instructionally-designed offline set for the Cedarline **Hybrid
 Mesh Firewall** clinic. Each table forms a **team of 8**, works **four case
 studies** (four customer pain points each), and designs one HMF.
 
-The pack is **four documents**. Every page is numbered.
+The pack is **four documents**, plus a one-page **Rubric Sheet** for evaluation. Every page is numbered.
 
 | Document | For | What it is |
 |---|---|---|
@@ -12,6 +12,7 @@ The pack is **four documents**. Every page is numbered.
 | `HMF-Solution-Guide` | Facilitator | Reference per pain point, with a **specific** underlying requirement, the standardised Cisco solution, and how it works plus the outcome, mapped to the three dimensions. |
 | `HMF-Activity-Guide` | Everyone | One document overview: mission, scenario, objectives, the four case studies, how to run it, **facilitating a team of 8**, and how we score. |
 | `HMF-Grading-Guide` | Facilitator | The proctor's **rubric** (a reference guide, no blanks to fill). An **analytic rubric** classifying every answer into levels, **Complete / Substantial / Developing / Minimal**, mapped to points for Problem Identifier (5), Solution Designer (10) and Value Communicator (10); an **overall-completion mapping** for the pain point (out of 25) and the case study (out of 100); **how to evaluate a submission**; a **worked example** that grades a sample answer step by step with a sample output; and per pain point, for **all three dimensions**, the **three levels of answer** (full / partial / no credit) with the full-marks answer and **acceptable alternatives**, each mapped to the score; and a **completed score sheet example** showing how to fill in the Workbook's Proctor evaluation page and hand the result back. Proctors grade against it and record scores on the Workbook's **Proctor evaluation page**. |
+| `HMF-Rubric-Sheet` | Facilitator | A standalone **one-page rubric** to keep beside you while evaluating: the three dimensions and their four levels with points, plus the pain-point (out of 25), case-study (out of 100) and **overall grade** (out of 400) bands. |
 
 ## Scoring
 
@@ -30,7 +31,11 @@ key**, so any proctor grades consistently. It has no blanks; scores are recorded
 on the Workbook's **Proctor evaluation page**. The **topology diagram is
 submitted for SME review**, not scored.
 
-**One-click download:** `HMF-Offline-Package.zip` (all four, PDF and Word).
+The overall score is also shared with the team as one of three **positive
+categories** so grades land in an encouraging tone: **Best** (300 to 400),
+**Better** (200 to 299), and **Good** (up to 199).
+
+**One-click download:** `HMF-Offline-Package.zip` (all four documents plus the Rubric Sheet, PDF and Word).
 `pdf/` is print-ready (verified). `docx/` is editable. Case studies are referred
 to as **Case Study 1 to 4** throughout.
 
