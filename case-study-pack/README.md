@@ -29,6 +29,7 @@ Each dimension is rated **Strong / Developing / Emerging** (see the Grading Guid
 | `HMF-Solution-Guide` | Facilitator | Reference per pain point, with the model answer mapped to the three dimensions so assessments are consistent. |
 | `HMF-Activity-Guide` | Everyone | One-spread overview: mission, scenario, objectives, the four case studies, how to run it (teams of 8), and how we score. |
 | `HMF-Proctor-Grading-Guide` | Facilitator | The scoring workbook. Per case study: a Strong / Developing / Emerging assessment on each dimension and a case study score out of 100; plus a summary table totalling to 400 and overall feedback. |
+| `HMF-Product-Glossary` | Everyone | A reference to every Cisco product, capability and term used in the clinic, grouped into platforms, capabilities and architecture. |
 
 The four case studies are referred to as **Case Study 1 to 4** throughout.
 
