@@ -1,21 +1,22 @@
 # HMF Design Clinic, Offline Pack
 
 A print-ready, instructionally-designed offline set for the Cedarline **Hybrid
-Mesh Firewall** clinic. Teams act as the Cisco Solution Engineering team, work
-**four case studies** (four customer pain points each), and design one HMF.
+Mesh Firewall** clinic. Each table forms a **team of 8**, works **four case
+studies** (four customer pain points each), and designs one HMF.
 
-## Scoring: three dimensions, 25 points per pain point
+## Scoring: a score per case study and overall, plus qualitative feedback
 
-Every pain point is scored on three dimensions:
+Each case study is scored across its four pain points, giving a **case study
+score out of 100** and an **overall score out of 400**. Alongside the score,
+each team is assessed on three dimensions, provided as **qualitative feedback**:
 
-| Dimension | Out of | What it rewards |
-|---|---|---|
-| 🔍 **Problem Identifier** | 5 | Correctly identified the customer's pain point and the requirements behind it. |
-| 🏗️ **Solution Designer** | 10 | Recommended the right Cisco solution, architecture, and approach. |
-| 🎯 **Value Communicator** | 10 | Clearly explained how the solution works and the customer outcomes it enables. |
+| Dimension | What it rewards |
+|---|---|
+| **Problem Identifier** | Correctly identified the customer's pain point and the requirements behind it. |
+| **Solution Designer** | Recommended the right Cisco solution, architecture, and approach. |
+| **Value Communicator** | Clearly explained how the solution works and the customer outcomes it enables. |
 
-That is **25 per pain point**, **100 per case study**, and **400 in total**.
-The Grading Guide has the full 0-to-max band descriptors for each dimension.
+Each dimension is rated **Strong / Developing / Emerging** (see the Grading Guide).
 
 ## The documents
 
@@ -24,15 +25,11 @@ The Grading Guide has the full 0-to-max band descriptors for each dimension.
 
 | Document | For | What it is |
 |---|---|---|
-| `HMF-Team-Workbook` | Each team | Mission and scenario, learning objectives, the three scoring dimensions, a product decoder and jargon glossary, the four case studies (generous answer spaces plus a scoring reminder per pain point), and a full-page topology paste area. |
-| `HMF-Solution-Guide` | Facilitator | Reference per pain point, with the model answer mapped to the three dimensions (Problem Identifier, Solution Designer, Value Communicator) so marks are awarded consistently. |
-| `HMF-Activity-Guide` | Everyone | One-spread overview: mission, objectives, the four case studies, how to run it, and how we score. |
-| `HMF-Proctor-Grading-Guide` | Facilitator | The scoring workbook. Dimension rubric with band descriptors, a per-case-study scoring grid (PI / SD / VC / total), a per-case-study feedback line, and a summary table totalling to 400. |
+| `HMF-Team-Workbook` | Each team | Mission and scenario, learning objectives, the three dimensions, a product decoder and jargon glossary, the four case studies (generous answer spaces), and a full-page topology paste area. |
+| `HMF-Solution-Guide` | Facilitator | Reference per pain point, with the model answer mapped to the three dimensions so assessments are consistent. |
+| `HMF-Activity-Guide` | Everyone | One-spread overview: mission, scenario, objectives, the four case studies, how to run it (teams of 8), and how we score. |
+| `HMF-Proctor-Grading-Guide` | Facilitator | The scoring workbook. Per case study: a Strong / Developing / Emerging assessment on each dimension and a case study score out of 100; plus a summary table totalling to 400 and overall feedback. |
 
-## The four case studies
-1. **AI Security**: compliance evidence, supply-chain vetting, AI visibility and runtime guardrails.
-2. **Cloud Edge**: contain lateral movement, prove consistent controls, one policy plane across clouds.
-3. **DC Edge, Perimeter Firewall**: rapid isolation, restore encrypted visibility, modernise detection.
-4. **Macro and Micro Segmentation**: safe segmentation with runtime visibility and app-dependency awareness.
+The four case studies are referred to as **Case Study 1 to 4** throughout.
 
 _Cedarline Health Group is fictional. Cisco Secure, HMF Design Clinic._
