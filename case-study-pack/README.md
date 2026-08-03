@@ -8,10 +8,10 @@ The pack is **four documents**. Every page is numbered.
 
 | Document | For | What it is |
 |---|---|---|
-| `HMF-Workbook` | Each team | Mission and scenario, learning objectives, the three dimensions, a **self-check**, a **worked example**, an integrated **product glossary** and jargon decoder, the four case studies (generous answer spaces), and a topology page **submitted for SME review**. |
+| `HMF-Workbook` | Each team | Mission and scenario, learning objectives, the three dimensions, a **self-check**, a **worked example**, an integrated **product glossary** and jargon decoder, an **HMF product reference** (each pain point → product / platform / feature), the four case studies (generous answer spaces), and a topology page **submitted for SME review**. |
 | `HMF-Solution-Guide` | Facilitator | Reference per pain point, with a **specific** underlying requirement, the standardised Cisco solution, and how it works plus the outcome, mapped to the three dimensions. |
 | `HMF-Activity-Guide` | Everyone | One document overview: mission, scenario, objectives, the four case studies, how to run it, **facilitating a team of 8**, and how we score. |
-| `HMF-Grading-Guide` | Facilitator | The scoring workbook. Per case study: a Strong / Developing / Emerging assessment on each dimension, a **ratings-to-score mapping**, and a case study score out of 100; a summary to 400; an **SME-review line** for the topology; and overall feedback. |
+| `HMF-Grading-Guide` | Facilitator | The scoring workbook. **How to evaluate a submitted Workbook**, then per case study the **broken-down expected answer** (Problem / Solution / Value) for every pain point to compare against, a Strong / Developing / Emerging assessment, a **ratings-to-score mapping**, and a case study score out of 100; a summary to 400; an **SME-review line** for the topology; and overall feedback. |
 
 ## Scoring
 
