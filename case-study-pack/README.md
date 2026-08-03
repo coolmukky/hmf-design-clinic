@@ -11,21 +11,22 @@ The pack is **four documents**. Every page is numbered.
 | `HMF-Workbook` | Each team | Mission and scenario, learning objectives, the three dimensions, a **quick-start**, a **self-check**, a **worked example**, a jargon decoder, a detachable **HMF product cheat-strip** (the whole HMF portfolio, uniform, no give-aways; participants identify the fit themselves), the four case studies with a per-case **task banner** and a **compact guided answer space** (Product / platform, How it helps, Outcome), a topology page **submitted for SME review**, and a final **Proctor evaluation page** (a score and feedback per case study, an overall score, and what the team did well and where they can learn and grow). |
 | `HMF-Solution-Guide` | Facilitator | Reference per pain point, with a **specific** underlying requirement, the standardised Cisco solution, and how it works plus the outcome, mapped to the three dimensions. |
 | `HMF-Activity-Guide` | Everyone | One document overview: mission, scenario, objectives, the four case studies, how to run it, **facilitating a team of 8**, and how we score. |
-| `HMF-Grading-Guide` | Facilitator | The scoring workbook. **How to evaluate a submitted Workbook**, then per case study the **broken-down expected answer** (Problem / Solution / Value) for every pain point to compare against, a Strong / Developing / Emerging assessment, a **ratings-to-score mapping**, and a case study score out of 100; then the same **Proctor evaluation page** that is bound into the back of every team's Workbook (a score and feedback per case study, an overall score out of 400, an **SME-review line** for the topology, and what the team did well and where they can learn and grow). |
+| `HMF-Grading-Guide` | Facilitator | The scoring instrument. A **rubric** scoring each pain point across the three dimensions, then **how to evaluate a submitted Workbook**, and per case study the **full-credit answer** for every pain point with a **score box per dimension** (5 / 10 / 10), a **pain-point total out of 25**, a case study total out of 100; then the same **Proctor evaluation page** bound into the back of every team's Workbook (a score and feedback per case study, an overall score out of 400, an **SME-review line** for the topology, and what the team did well and where they can learn and grow). |
 
 ## Scoring
 
-Each case study is scored across its four pain points (**out of 100**), for an
-**overall score out of 400**. Each team is also assessed on three dimensions,
-provided as **qualitative feedback**:
+Each **pain point** is scored across the three dimensions, for **25 per pain
+point**. Four pain points make a **case study score out of 100**, and the four
+case studies make an **overall score out of 400**:
 
-- **Problem Identifier** — correctly identified the pain point and requirements.
-- **Solution Designer** — recommended the right Cisco solution, architecture and approach.
-- **Value Communicator** — explained how the solution works and the customer outcomes.
+- **Problem Identifier** (out of 5) — identified the pain point and the requirement behind it.
+- **Solution Designer** (out of 10) — recommended the right Cisco solution, architecture and approach.
+- **Value Communicator** (out of 10) — explained how the solution works and the customer outcome.
 
-Each dimension is rated **Strong / Developing / Emerging**, and the overall
-picture maps to a suggested score range (mostly Strong ≈ 85–100, and so on).
-The **topology diagram is submitted for SME review**, not scored.
+The Grading Guide gives a **score-band rubric** for each dimension and the
+**full-credit answer** for every pain point, so the proctor can match the
+team's written answer to a score. The **topology diagram is submitted for SME
+review**, not scored.
 
 **One-click download:** `HMF-Offline-Package.zip` (all four, PDF and Word).
 `pdf/` is print-ready (verified). `docx/` is editable. Case studies are referred
