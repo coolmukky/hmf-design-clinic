@@ -4,17 +4,18 @@ A print-ready, instructionally-designed offline set for the Cedarline **Hybrid
 Mesh Firewall** clinic. Teams act as the Cisco Solution Engineering team, work
 **four case studies** (four customer pain points each), and design one HMF.
 
-## Evaluation: qualitative and encouraging, **Good, Better, Best**
-No marks, no pass or fail. Every answer sits on a growth ladder:
+## Scoring: three dimensions, 25 points per pain point
 
-| Stage | What it shows |
-|---|---|
-| 🌱 **Good, Names the fit** | The right Cisco solution is on the table and the SE clearly understands the customer's problem. |
-| 🔷 **Better, Explains the how** | The SE connects the solution to the concern, consultatively. |
-| ⭐ **Best, Sells the outcome** | The SE ties it to Cedarline's real constraints and the business outcome, and places it in the wider HMF story. |
+Every pain point is scored on three dimensions:
 
-Facilitators name where each answer lands and coach one step up: strengths first,
-then one growth nudge. The result is a **qualitative profile**, not a number.
+| Dimension | Out of | What it rewards |
+|---|---|---|
+| 🔍 **Problem Identifier** | 5 | Correctly identified the customer's pain point and the requirements behind it. |
+| 🏗️ **Solution Designer** | 10 | Recommended the right Cisco solution, architecture, and approach. |
+| 🎯 **Value Communicator** | 10 | Clearly explained how the solution works and the customer outcomes it enables. |
+
+That is **25 per pain point**, **100 per case study**, and **400 in total**.
+The Grading Guide has the full 0-to-max band descriptors for each dimension.
 
 ## The documents
 
@@ -23,10 +24,10 @@ then one growth nudge. The result is a **qualitative profile**, not a number.
 
 | Document | For | What it is |
 |---|---|---|
-| `HMF-Team-Workbook` | Each team | Mission and scenario, learning objectives, the Good, Better, Best ladder, a product decoder and jargon glossary, the four case studies (generous answer spaces plus an "aim high" cue per pain point), and a full-page topology paste area. |
-| `HMF-Solution-Guide` | Facilitator | Reference per pain point (fitting solution, how a strong SE explains it, the outcome) plus what Good, Better and Best sound like for that concern. |
-| `HMF-Activity-Guide` | Everyone | One-spread overview: mission, objectives, the four case studies, how to run it, and the Good, Better, Best approach. |
-| `HMF-Proctor-Grading-Guide` | Facilitator | Qualitative coaching sheet. Per pain point, mark Good, Better or Best and note "what landed" and "level up"; per case study, a qualitative profile plus strengths and growth; plus an overall profile. No numbers. |
+| `HMF-Team-Workbook` | Each team | Mission and scenario, learning objectives, the three scoring dimensions, a product decoder and jargon glossary, the four case studies (generous answer spaces plus a scoring reminder per pain point), and a full-page topology paste area. |
+| `HMF-Solution-Guide` | Facilitator | Reference per pain point, with the model answer mapped to the three dimensions (Problem Identifier, Solution Designer, Value Communicator) so marks are awarded consistently. |
+| `HMF-Activity-Guide` | Everyone | One-spread overview: mission, objectives, the four case studies, how to run it, and how we score. |
+| `HMF-Proctor-Grading-Guide` | Facilitator | The scoring workbook. Dimension rubric with band descriptors, a per-case-study scoring grid (PI / SD / VC / total), a per-case-study feedback line, and a summary table totalling to 400. |
 
 ## The four case studies
 1. **AI Security**: compliance evidence, supply-chain vetting, AI visibility and runtime guardrails.
