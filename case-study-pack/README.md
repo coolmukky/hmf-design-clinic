@@ -1,35 +1,42 @@
-# HMF Design Clinic — Case Study Pack (offline)
+# HMF Design Clinic — Offline Pack
 
-A fresh, print-ready offline set built from the aligned use-case sheet. The four
-use cases are presented as **Case Study 1–4**, each with **four pain points** for
-teams to work. Same activity, no infrastructure needed.
+A print-ready, instructionally-designed offline set for the Cedarline **Hybrid
+Mesh Firewall** clinic. Teams act as the Cisco Solution Engineering team, work
+**four case studies** (four customer pain points each), and design one HMF.
 
-**Grading is integrated throughout.** The three achievement levels —
-**Associate / Professional / Expert** — appear in the Team Workbook ("how you'll
-be scored"), the Activity Guide, and the Solution Guide (master rubric + per-pain-point
-level cues), and drive the standalone Proctor Grading Guide.
+**Written for two audiences at once** — Security Specialists *and* generalist SEs
+who aren't security specialists. Every case study carries a plain-language
+"🧭 New to this area?" note and a "🔐 For security specialists" note, plus the
+Team Workbook has a product decoder and a jargon glossary so anyone can contribute.
 
-**One-click download:** `HMF-Offline-Package.zip` (all documents, PDF + Word).
-**PDFs are in `pdf/`** — the recommended, verified format for printing.
-**Editable Word versions are in `docx/`** — same layout with large answer boxes; edit wording as needed.
+## Evaluation — qualitative, encouraging: **Good · Better · Best**
+No marks, no pass/fail. Every answer sits on a growth ladder:
+
+| | Stage | What it shows |
+|---|---|---|
+| 🌱 | **Good — Names the fit** | The right Cisco solution is on the table and the SE clearly gets the customer's problem. |
+| 🔷 | **Better — Explains the how** | The SE connects the solution to the concern, consultatively. |
+| ⭐ | **Best — Sells the outcome** | The SE ties it to Cedarline's real constraints and the business outcome, and places it in the wider HMF story. |
+
+Facilitators name where each answer lands and coach one step up — strengths first,
+then one growth nudge. The result is a **qualitative profile**, not a number.
+
+## The documents
+
+**One-click download:** `HMF-Offline-Package.zip` (all four, PDF + Word).
+`pdf/` = print-ready (verified). `docx/` = editable.
 
 | Document | For | What it is |
 |---|---|---|
-| `HMF-Team-Workbook.pdf` | Each team | Cover + Cedarline scenario, a **"how you'll be scored" levels panel**, **Case Study 1–4** (four pain points each) with large, clearly-ruled answer spaces for **Product / Platform** and the **Solution-Engineer response**, and a **full-page space at the end to paste the team's topology diagram**. |
-| `HMF-Proctor-Guide.pdf` | Proctor | **Solution guide** — reference answers for all 16 pain points (expected product, model SE response, how it helps) **with per-pain-point level cues**, plus a **"Grading at a glance" master rubric** (Associate / Professional / Expert). |
-| `HMF-Proctor-Grading-Guide.pdf` | Proctor | **Level-based grading rubric** — Associate / Professional / Expert. Master rubric, step-by-step guidelines, the expected answer at each level for all 16 pain points, per-pain-point score lines, per-Case-Study feedback boxes (did well / improve), and a score summary (/400 + overall level). |
-| `HMF-Proctor-Cheat-Sheet.pdf` | Proctor | One at-a-glance landscape table: every pain point → expected product → key SE reasoning, with fast-scoring guidance. |
-| `HMF-Activity-Guide.pdf` | Everyone | One-page overview — scenario, roles, the four Case Studies, how to run it, and scoring. |
+| `HMF-Team-Workbook` | Each team | Mission + scenario, learning objectives, the dual-audience markers, the Good/Better/Best ladder, a **portfolio decoder + jargon glossary**, the four case studies (answer spaces + an "aim high" cue per pain point), and a full-page **topology paste area**. |
+| `HMF-Solution-Guide` | Facilitator | Reference per pain point — fitting solution, how a strong SE explains it, the outcome — **plus what Good / Better / Best sound like** for that concern, with dual-audience notes. |
+| `HMF-Activity-Guide` | Everyone | One-spread overview — mission, objectives, audience note, the four case studies, how to run it, and the Good/Better/Best approach. |
+| `HMF-Proctor-Grading-Guide` | Facilitator | Qualitative **coaching sheet** — per pain point: mark Good/Better/Best + "what landed / level up"; per case study: a qualitative profile + strengths/growth; plus an overall profile. No numbers. |
 
-## The four Case Studies
+## The four case studies
 1. **AI Security** — compliance evidence, supply-chain vetting, AI visibility & runtime guardrails.
 2. **Cloud Edge** — contain lateral movement, prove consistent controls, one policy plane across clouds.
-3. **DC Edge — Perimeter Firewall** — restore visibility, speed response, modernise detection.
+3. **DC Edge · Perimeter Firewall** — rapid isolation, restore encrypted visibility, modernise detection.
 4. **Macro & Micro Segmentation** — safe segmentation with runtime visibility and app-dependency awareness.
-
-## Scoring
-**25 points per pain point → 100 per Case Study → 400 total.** Marks reward an
-appropriate product **and** Solution-Engineer reasoning specific to Cedarline —
-not generic statements.
 
 _Cedarline Health Group is fictional · Cisco Secure · HMF Design Clinic._
