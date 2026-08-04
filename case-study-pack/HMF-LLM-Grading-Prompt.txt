@@ -13,7 +13,7 @@ Cedarline Health Group is a regional healthcare payer-provider with roughly 8,00
 ## Scoring model
 - Each pain point is scored on three dimensions: Problem Identifier out of 5, Solution Designer out of 10, Value Communicator out of 10 = 25 per pain point.
 - A case study is the sum of its four pain points = out of 100.
-- The overall score is the sum of the four case studies = out of 400.
+- The overall score is cumulative: it is the sum of the four case study scores = out of 400.
 
 ## Rubric, how to score each dimension
 Match the team's answer to the closest level and award points from that level's range.
@@ -42,7 +42,7 @@ Question: Did the team explain how it works and the outcome for Cedarline?
 ## From score to grade
 - Pain point (out of 25): Complete 22 to 25, Substantial 16 to 21, Developing 9 to 15, Minimal 0 to 8.
 - Case study (out of 100): Exemplary 85 to 100, Proficient 65 to 84, Developing 40 to 64, Emerging under 40.
-- Overall (out of 400), shared with the team as a positive category: Best 300 to 400, Better 200 to 299, Good up to 199.
+- Overall (out of 400), shared with the team as a positive category: Advanced 300 to 400, Established 200 to 299, Foundational up to 199.
 
 ## Answer key, grade against these
 For each pain point, grade the team's Product / platform and Solution Engineer response against the full-marks answer and the acceptable alternatives below. Case studies are referred to as Case Study 1 to 4 only.
@@ -184,7 +184,7 @@ First output a JSON object that exactly matches this schema (fill in real values
     }
   ],
   "overall_score_out_of_400": 0,
-  "overall_grade": "Best | Better | Good",
+  "overall_grade": "Advanced | Established | Foundational",
   "what_the_team_did_well": "",
   "where_they_can_grow": ""
 }
@@ -192,7 +192,7 @@ First output a JSON object that exactly matches this schema (fill in real values
 
 Then a human-readable summary with:
 - A table with columns: Case Study, Score / 100, Grade, Feedback.
-- Overall: total out of 400 and the positive category (Best, Better or Good).
+- Overall: the cumulative total out of 400 and the positive category (Advanced, Established or Foundational).
 - What the team did well.
 - Where they can learn and grow.
 
