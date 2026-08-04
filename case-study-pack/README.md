@@ -33,9 +33,9 @@ on the Workbook's **Proctor evaluation page**. The **topology diagram is
 submitted for SME review**, not scored.
 
 The overall score is also shared with the team as one of three **positive
-categories** so grades land in an encouraging tone: **Advanced** (300 to 400),
-**Established** (200 to 299), and **Foundational** (up to 199). The overall score
-is **cumulative**: the four case study scores add up to the total out of 400.
+categories** so grades land in an encouraging tone: **Solution Strategist** (300 to
+400), **Solution Designer** (200 to 299), and **Solution Explorer** (up to 199). The
+overall score is **cumulative**: the four case study scores add up to the total out of 400.
 
 **One-click download:** `HMF-Offline-Package.zip` (all four documents plus the Rubric Sheet, PDF and Word).
 `pdf/` is print-ready (verified). `docx/` is editable. Case studies are referred
