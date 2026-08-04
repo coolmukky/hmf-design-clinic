@@ -136,7 +136,7 @@ For each pain point, grade the team's Product / platform and Solution Engineer r
 - Value Communicator, full marks: How it works: That's one of the biggest reasons customers adopt Cisco Secure Workload. It gives you deep visibility into workload communication and application dependency mapping, so you can see how applications actually behave before enforcing policy. Outcome: Reveals actual application communication paths. Reduces the risk of segmentation causing outages. Partial: Explains the how or the outcome, but not both, or keeps it generic rather than specific to Cedarline. No credit: Claims it helps, with no explanation of how it works and no Cedarline outcome.
 
 ## Grading steps
-1. For each pain point, read the team's Product / platform and Solution Engineer response (which should cover how it helps and the outcome).
+1. For each pain point, read the team's three-part answer: the requirement they named (Problem Identifier), the Product / platform (Solution Designer), and how it helps and the outcome (Value Communicator).
 2. Score each dimension by the rubric level it matches, using the answer key. A blank or missing answer scores 0 on that dimension.
 3. Add the three dimension scores for the pain point total out of 25.
 4. Add the four pain point totals for the case study score out of 100, and assign the case study grade band.
@@ -197,7 +197,7 @@ Then a human-readable summary with:
 - Where they can learn and grow.
 
 ## Team submission
-Paste the team's completed Workbook answers below, including for each pain point their Product / platform and their Solution Engineer response.
+Paste the team's completed Workbook answers below, including for each pain point the requirement they named, their Product / platform, and how it helps and the outcome.
 
 --- BEGIN TEAM SUBMISSION ---
 [Paste the participant group's answers here]
