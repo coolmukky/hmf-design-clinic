@@ -10,7 +10,7 @@ differentiated the three teams consistently with the Grading Guide rubric.
 | Sample team | Authored quality | Case Study scores (/100) | Overall (/400) | Category |
 |---|---|---|---|---|
 | Team A | Strong: names the requirement, the right product, and a clear how + outcome (used two acceptable alternatives) | 79, 83, 85, 76 | **323** | **Solution Strategist** |
-| Team B | Mixed: nails the requirement and the right product and capability, but generic value with no concrete outcome | 64, 64, 64, 64 | **256** | **Solution Designer** |
+| Team B | Mixed: nails the requirement and the right product and capability, but generic value with no concrete outcome | 64, 64, 64, 64 | **256** | **Solution Builder** |
 | Team C | Developing: default or blank products, generic one-line responses | 8, 10, 10, 8 | **36** | **Solution Explorer** |
 
 ## What the test confirmed
@@ -25,7 +25,7 @@ differentiated the three teams consistently with the Grading Guide rubric.
 - **Blanks score zero.** Team C's blank products and responses scored 0 on those
   dimensions, and generic default products (a firewall for an AI concern) scored Minimal,
   while a firewall for the one genuine firewall concern earned partial credit.
-- **Positive overall categories** (Solution Strategist / Solution Designer / Solution Explorer) were applied to the cumulative
+- **Positive overall categories** (Solution Strategist / Solution Builder / Solution Explorer) were applied to the cumulative
   score, matching the Grading Guide.
 
 ## How to reproduce

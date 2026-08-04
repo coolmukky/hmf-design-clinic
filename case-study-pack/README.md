@@ -34,7 +34,7 @@ submitted for SME review**, not scored.
 
 The overall score is also shared with the team as one of three **positive
 categories** so grades land in an encouraging tone: **Solution Strategist** (300 to
-400), **Solution Designer** (200 to 299), and **Solution Explorer** (up to 199). The
+400), **Solution Builder** (200 to 299), and **Solution Explorer** (up to 199). The
 overall score is **cumulative**: the four case study scores add up to the total out of 400.
 
 **One-click download:** `HMF-Offline-Package.zip` (all four documents plus the Rubric Sheet, PDF and Word).

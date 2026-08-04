@@ -42,7 +42,7 @@ Question: Did the team explain how it works and the outcome for Cedarline?
 ## From score to grade
 - Pain point (out of 25): Complete 22 to 25, Substantial 16 to 21, Developing 9 to 15, Minimal 0 to 8.
 - Case study (out of 100): Exemplary 85 to 100, Proficient 65 to 84, Developing 40 to 64, Emerging under 40.
-- Overall (out of 400), shared with the team as a positive category: Solution Strategist 300 to 400, Solution Designer 200 to 299, Solution Explorer up to 199.
+- Overall (out of 400), shared with the team as a positive category: Solution Strategist 300 to 400, Solution Builder 200 to 299, Solution Explorer up to 199.
 
 ## Answer key, grade against these
 For each pain point, grade the team's Product / platform and Solution Engineer response against the full-marks answer and the acceptable alternatives below. Case studies are referred to as Case Study 1 to 4 only.
@@ -184,7 +184,7 @@ First output a JSON object that exactly matches this schema (fill in real values
     }
   ],
   "overall_score_out_of_400": 0,
-  "overall_grade": "Solution Strategist | Solution Designer | Solution Explorer",
+  "overall_grade": "Solution Strategist | Solution Builder | Solution Explorer",
   "what_the_team_did_well": "",
   "where_they_can_grow": ""
 }
@@ -192,7 +192,7 @@ First output a JSON object that exactly matches this schema (fill in real values
 
 Then a human-readable summary with:
 - A table with columns: Case Study, Score / 100, Grade, Feedback.
-- Overall: the cumulative total out of 400 and the positive category (Solution Strategist, Solution Designer or Solution Explorer).
+- Overall: the cumulative total out of 400 and the positive category (Solution Strategist, Solution Builder or Solution Explorer).
 - What the team did well.
 - Where they can learn and grow.
 
