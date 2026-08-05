@@ -36,10 +36,12 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
   .card.team{border-left:5px solid var(--cyan)}
   .card.proctor{border-left:5px solid var(--amber)}
+  .card.board{border-left:5px solid var(--green)}
   .card h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--navy);margin-bottom:2px;display:flex;align-items:center;gap:9px}
   .card h2 .tag{font-family:"IBM Plex Mono";font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 9px;border-radius:20px}
   .tag.forteam{background:#E4F6FB;color:var(--cyan-deep);border:1px solid #B7E6F3}
   .tag.foryou{background:#FBEBD3;color:#8a560f;border:1px solid #F0CE97}
+  .tag.forall{background:var(--green-soft);color:#0d6e4e;border:1px solid #9fdcc4}
   .card .sub{color:var(--ink-soft);font-size:13.5px;margin:2px 0 16px}
   .linkrow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
   .linkbox{flex:1;min-width:280px;display:flex;align-items:center;background:#F7F9FC;border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -120,6 +122,16 @@
     <div class="qrpair"><div class="qr"><div class="box" id="qrGrader"></div><div class="cap"><b>Scan to upload</b><br>a worksheet</div></div></div>
   </div>
 
+  <!-- LEADERBOARD -->
+  <div class="card board">
+    <h2><span class="tag forall">For everyone</span> Live leaderboard — project or share</h2>
+    <p class="sub">A read-only scoreboard that updates in real time as scores are saved. No event code, no login — safe to put on the projector or share with the whole room. (Has an auto-scroll button for big screens.)</p>
+    <div class="linkrow">
+      <div class="linkbox"><div class="u" id="uLeaderboard"></div><button class="copy" data-t="uLeaderboard">Copy</button></div>
+    </div>
+    <div class="qrpair"><div class="qr"><div class="box" id="qrLeaderboard"></div><div class="cap"><b>Scan to watch</b><br>the standings</div></div></div>
+  </div>
+
   <!-- PROCTOR -->
   <div class="card proctor">
     <h2><span class="tag foryou">For you (proctor)</span> Consoles — keep on your laptop</h2>
@@ -127,10 +139,13 @@
     <div class="linkrow" style="margin-bottom:10px">
       <div class="linkbox"><div class="u" id="uProctor"></div><button class="copy" data-t="uProctor">Copy</button></div>
     </div>
-    <div class="linkrow">
+    <div class="linkrow" style="margin-bottom:10px">
       <div class="linkbox"><div class="u" id="uGraderProctor"></div><button class="copy" data-t="uGraderProctor">Copy</button></div>
     </div>
-    <p class="note">First is the <b>activity proctor console</b>; second is the <b>grader proctor</b> (open its Proctor tab). Both use the same event code.</p>
+    <div class="linkrow">
+      <div class="linkbox"><div class="u" id="uScoreTool"></div><button class="copy" data-t="uScoreTool">Copy</button></div>
+    </div>
+    <p class="note">First is the <b>activity proctor console</b>; second is the <b>grader proctor</b> (open its Proctor tab). Third is the <b>Team Scoring tool</b> (upload a workbook, auto-score or Grade with AI, save to the leaderboard) — it opens on a passcode: <span class="mono">hmf-clinic-2026</span>. Keep all three off the team QR codes.</p>
   </div>
 
   <!-- HOW TO RUN -->
@@ -151,6 +166,7 @@
   <a href="./">Activity</a>
   <a href="proctor.html">Proctor console</a>
   <a href="grader.html">Solution Grader</a>
+  <a href="leaderboard.html">Live leaderboard</a>
   <a href="playbook.html">Playbook</a>
   <span style="color:var(--ink-faint)">· Cedarline Health Group is fictional · Cisco Secure</span>
 </div></footer>
@@ -162,7 +178,9 @@
     uParticipant:   function(c){ return BASE + "?room=" + c; },
     uGrader:        function(c){ return BASE + "grader.html?room=" + c; },
     uProctor:       function(c){ return BASE + "proctor.html?room=" + c; },
-    uGraderProctor: function(c){ return BASE + "grader.html?room=" + c; }
+    uGraderProctor: function(c){ return BASE + "grader.html?room=" + c; },
+    uLeaderboard:   function(){ return BASE + "leaderboard.html"; },              // public, no code
+    uScoreTool:     function(){ return BASE + "tools/HMF-Scoring-Tool.html"; }    // proctor-only, passcode
   };
   var qrP=null, qrG=null;
   function makeQR(el, text){
@@ -175,6 +193,7 @@
     Object.keys(LINKS).forEach(function(id){ document.getElementById(id).textContent = LINKS[id](c); });
     makeQR(document.getElementById("qrParticipant"), LINKS.uParticipant(c));
     makeQR(document.getElementById("qrGrader"), LINKS.uGrader(c));
+    makeQR(document.getElementById("qrLeaderboard"), LINKS.uLeaderboard(c));
     try{ localStorage.setItem("hmf:eventcode", c); }catch(e){}
   }
   document.getElementById("code").addEventListener("input", render);
