@@ -40,5 +40,11 @@ so use the **hosted** page (GitHub Pages) or open the file locally, not a locked
   block from `firestore.rules` once (Firebase Console, Firestore, Rules, Publish) so writes
   are allowed. If Firebase is unreachable, the page falls back to an on-device leaderboard.
 
-_Facilitator tool: it embeds the answer key, so do not hand it to participants before they finish._
+## Facilitator passcode
+The page embeds the answer key, so it opens on a **passcode gate**. The key and the AI
+grading context are AES-GCM encrypted in the file (the page source shows only ciphertext);
+entering the passcode decrypts them in the browser. Default passcode: **`hmf-clinic-2026`** —
+share it only with proctors. To set your own, rebuild with `HMF_TOOL_PASSCODE="…"`.
+
+_Facilitator tool: even with the gate, treat the URL as proctor-only._
 _Cedarline Health Group is fictional. Cisco Secure, HMF Design Clinic._
