@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HMF Design Clinic, Team Scoring & Leaderboard</title>
+</head>
+<body>
+
+<style>
+  :root{
+    --bg:#eef3f9; --surface:#ffffff; --surface2:#f4f7fb; --ink:#0d274d; --body:#33465f; --muted:#6b7d93;
+    --border:#e1e8f1; --line:#eef2f7; --accent:#036c8f; --accent2:#00bceb; --navy:#0d274d;
+    --strat:#0e7c86; --strat-bg:#e5f5f4; --build:#0b6e9e; --build-bg:#e6f2f9; --explore:#5a6b82; --explore-bg:#eef1f6;
+    --good:#0e7c86; --warn:#b7791f; --bad:#9a3b3b;
+    --shadow:0 1px 2px rgba(13,39,77,.06),0 8px 24px rgba(13,39,77,.06);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#081221; --surface:#0f1e33; --surface2:#132540; --ink:#eaf1f8; --body:#b7c6d9; --muted:#8798ad;
+      --border:#22344c; --line:#1a2b42; --accent:#35c0de; --accent2:#00bceb; --navy:#0b1c33;
+      --strat:#4fd3c4; --strat-bg:#123330; --build:#5bb8e6; --build-bg:#102a3e; --explore:#9fb0c6; --explore-bg:#182a41;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#081221; --surface:#0f1e33; --surface2:#132540; --ink:#eaf1f8; --body:#b7c6d9; --muted:#8798ad;
+    --border:#22344c; --line:#1a2b42; --accent:#35c0de; --accent2:#00bceb; --navy:#0b1c33;
+    --strat:#4fd3c4; --strat-bg:#123330; --build:#5bb8e6; --build-bg:#102a3e; --explore:#9fb0c6; --explore-bg:#182a41;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"]{
+    --bg:#eef3f9; --surface:#ffffff; --surface2:#f4f7fb; --ink:#0d274d; --body:#33465f; --muted:#6b7d93;
+    --border:#e1e8f1; --line:#eef2f7; --accent:#036c8f; --accent2:#00bceb; --navy:#0d274d;
+    --strat:#0e7c86; --strat-bg:#e5f5f4; --build:#0b6e9e; --build-bg:#e6f2f9; --explore:#5a6b82; --explore-bg:#eef1f6;
+    --shadow:0 1px 2px rgba(13,39,77,.06),0 8px 24px rgba(13,39,77,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--body);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 40px}
+  a{color:var(--accent)}
+  /* header */
+  header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .brand .eyebrow{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+  .brand h1{margin:3px 0 2px;font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.01em;text-wrap:balance}
+  .brand p{margin:0;color:var(--muted);font-size:13.5px}
+  .theme-btn{border:1px solid var(--border);background:var(--surface);color:var(--body);border-radius:9px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+  .theme-btn:hover{border-color:var(--accent)}
+  /* layout */
+  .grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:18px;align-items:start}
+  @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card>.hd{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .card>.hd h2{margin:0;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:.01em}
+  .card>.hd .sub{font-size:12px;color:var(--muted)}
+  .card>.bd{padding:18px}
+  /* form */
+  label.fld{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 6px}
+  input[type=text],textarea{width:100%;border:1px solid var(--border);background:var(--surface2);color:var(--ink);border-radius:10px;padding:11px 12px;font:inherit;font-size:14px}
+  input[type=text]:focus,textarea:focus,button:focus-visible,.drop:focus-visible{outline:2px solid var(--accent2);outline-offset:1px}
+  textarea{resize:vertical;min-height:104px;line-height:1.45}
+  .field{margin-bottom:14px}
+  .drop{border:1.5px dashed var(--border);border-radius:12px;background:var(--surface2);padding:14px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .drop:hover,.drop.drag{border-color:var(--accent2);background:color-mix(in srgb,var(--accent2) 8%,var(--surface2))}
+  .drop .big{font-weight:700;color:var(--ink);font-size:14px}
+  .drop .small{font-size:12px;color:var(--muted);margin-top:3px}
+  .status{font-size:12.5px;margin-top:8px;min-height:17px;color:var(--muted)}
+  .status.ok{color:var(--good)} .status.warn{color:var(--warn)} .status.err{color:var(--bad)}
+  .btn{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;width:100%;transition:filter .15s,opacity .15s}
+  .btn.primary{background:linear-gradient(180deg,#0f8fb0,#036c8f);color:#fff}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn.save{background:var(--navy);color:#fff;margin-top:6px}
+  .btn.save:hover{filter:brightness(1.12)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
+  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--body);width:auto;padding:7px 12px;font-size:12.5px;font-weight:600}
+  .btn.ghost:hover{border-color:var(--accent)}
+  /* results */
+  #results{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:none}
+  #results.show{display:block}
+  .csrow{display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+  .csrow:first-of-type{border-top:0}
+  .csrow .nm{font-weight:700;color:var(--ink);font-size:14px}
+  .csrow .bd2{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .csrow .sc{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+  .csrow input{width:56px;text-align:center;padding:7px 4px;font-weight:800;color:var(--ink)}
+  .csrow .out{font-size:12px;color:var(--muted)}
+  .totrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:13px 15px;background:var(--surface2);border:1px solid var(--border);border-radius:12px}
+  .totrow .tl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .totrow .tv{font-size:26px;font-weight:800;color:var(--ink)}
+  .totrow .tv small{font-size:14px;color:var(--muted);font-weight:700}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:800;letter-spacing:.01em}
+  .chip.strat{background:var(--strat-bg);color:var(--strat)} .chip.build{background:var(--build-bg);color:var(--build)} .chip.explore{background:var(--explore-bg);color:var(--explore)}
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .note{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+  /* leaderboard */
+  .lbwrap{overflow-x:auto}
+  table.lb{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+  table.lb th{text-align:right;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:0 10px 9px;border-bottom:1px solid var(--border);white-space:nowrap}
+  table.lb th.l,table.lb td.l{text-align:left}
+  table.lb td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+  table.lb td.tot{font-weight:800;color:var(--ink)}
+  table.lb tr:last-child td{border-bottom:0}
+  .rank{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;font-weight:800;font-size:12px;color:var(--muted);background:var(--surface2)}
+  .rank.m1{background:#f6e6b8;color:#7a5c11} .rank.m2{background:#e3e7ec;color:#4b5563} .rank.m3{background:#efd8c2;color:#7c4a24}
+  :root[data-theme="dark"] .rank.m1{background:#4a3d13;color:#f2d585} :root[data-theme="dark"] .rank.m2{background:#2b3444;color:#c9d3e0} :root[data-theme="dark"] .rank.m3{background:#3d2a1c;color:#e0b48c}
+  @media (prefers-color-scheme:dark){ .rank.m1{background:#4a3d13;color:#f2d585} .rank.m2{background:#2b3444;color:#c9d3e0} .rank.m3{background:#3d2a1c;color:#e0b48c} }
+  .team{font-weight:700;color:var(--ink)}
+  .mini{font-size:11px;padding:3px 8px}
+  .del{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:4px;border-radius:6px}
+  .del:hover{color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+  .empty{text-align:center;color:var(--muted);padding:34px 16px;font-size:13.5px}
+  .empty .ico{font-size:26px;opacity:.5;margin-bottom:6px}
+  .foot{margin-top:22px;color:var(--muted);font-size:12px;line-height:1.6;max-width:70ch}
+  .foot b{color:var(--body)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Cisco Secure &middot; HMF Design Clinic</div>
+      <h1>Team Scoring &amp; Leaderboard</h1>
+      <p>Upload a team's completed Workbook to auto-score it against the rubric, then save to the leaderboard.</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle colour theme"><span id="themeIco">&#9789;</span><span id="themeTxt">Dark</span></button>
+  </header>
+
+  <div class="grid">
+    <!-- SCORE PANEL -->
+    <section class="card" aria-labelledby="scoreH">
+      <div class="hd"><h2 id="scoreH">Score a team</h2><span class="sub">Step 1</span></div>
+      <div class="bd">
+        <div class="field">
+          <label class="fld" for="team">Team name</label>
+          <input type="text" id="team" placeholder="e.g. Blue Team" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label class="fld" for="file">Completed Workbook</label>
+          <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a Workbook file or drop it here">
+            <div class="big">Drop a file or click to choose</div>
+            <div class="small">.docx or .txt &middot; or paste the team's answers below</div>
+          </div>
+          <input type="file" id="file" accept=".docx,.txt,text/plain" hidden />
+          <textarea id="paste" placeholder="Or paste the team's answers here (Case Study 1&hellip;4, each with its four pain points)." style="margin-top:10px"></textarea>
+          <div class="status" id="status" role="status" aria-live="polite"></div>
+        </div>
+        <button class="btn primary" id="scoreBtn" type="button">Auto-score workbook</button>
+
+        <div id="results" aria-live="polite">
+          <div id="csrows"></div>
+          <div class="totrow">
+            <div>
+              <div class="tl">Cumulative</div>
+              <div class="tv num"><span id="total">0</span> <small>/ 400</small></div>
+            </div>
+            <span class="chip" id="cat"><span class="dot"></span><span id="catName"></span></span>
+          </div>
+          <p class="note" id="parseNote"></p>
+          <button class="btn save" id="saveBtn" type="button" disabled>Save to leaderboard</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEADERBOARD PANEL -->
+    <section class="card" aria-labelledby="lbH">
+      <div class="hd">
+        <h2 id="lbH">Leaderboard <span class="sub num" id="lbCount"></span></h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" id="csvBtn" type="button">Export CSV</button>
+          <button class="btn ghost" id="clearBtn" type="button">Clear all</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="lbwrap">
+          <table class="lb" id="lb">
+            <thead><tr>
+              <th class="l" style="width:34px">#</th>
+              <th class="l">Team</th>
+              <th>CS1</th><th>CS2</th><th>CS3</th><th>CS4</th>
+              <th>Total</th>
+              <th class="l">Grade</th>
+              <th style="width:30px"></th>
+            </tr></thead>
+            <tbody id="lbBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="empty"><div class="ico">&#9733;</div>No teams scored yet. Score a team on the left to start the leaderboard.</div>
+      </div>
+    </section>
+  </div>
+
+  <p class="foot">
+    <b>How scoring works.</b> Each pain point is scored on three dimensions, Problem Identifier (5), Solution Designer (10) and Value Communicator (10), for 25 per pain point; four pain points make a case study score out of 100 and the four case studies a cumulative score out of 400. The auto-score reads the team's answers, matches the product they named against the answer key (including acceptable alternatives), and gauges the requirement and value against the model answer. It is a <b>rubric-based estimate to start from</b>, not a final grade: adjust any section before saving. <b>The leaderboard is stored on this device only</b> (use Export CSV to keep a record). Cedarline Health Group is fictional.
+  </p>
+</div>
+
+<script>
+const SCOREKEY = {"pp":[{"cs":1,"pp":1,"concern":"Under the EU AI Act, we are classified as a 'Provider' for our internal AI systems. We need to demonstrate robustness and cybersecurity compliance to satisfy Ar","primary":["ai defense"],"alts":[],"feat":["model","application","validation"],"req":["provider","level","evidence","robustness","cybersecurity","article"],"how":["defense","specifically","designed","support","provider","obligations","utilize","algorithmic","teaming","technology"],"out":["automates","technical","evidence","gathering","required","conformity","assessments","mapping","specific","threats"]},{"cs":1,"pp":2,"concern":"We are integrating various open-source models and third-party agents into our internal workflows. How can we ensure these assets aren't introducing vulnerabilit","primary":["ai defense"],"alts":["ai defense applied as a pre production gate"],"feat":["supply","chain","risk","management"],"req":["vetting","models","third","party","agents","vulnerabilities","reach","production"],"how":["defense","addresses","through","proactive","supply","chain","risk","management","scan","model"],"out":["enables","shift","left","creating","inventory","models","agents","identifying","vulnerabilities","production"]},{"cs":1,"pp":3,"concern":"We know AI is showing up across our cloud environments faster than security can track it. We're worried we have models, agents, datasets, and MCP-connected tool","primary":["ai defense"],"alts":["multicloud defense"],"feat":["cloud","visibility"],"req":["visibility","consistent","control","assets","models","agents","datasets","tools","cloud"],"how":["exactly","visibility","defense","built","solve","cloud","continuously","discovers","assets","distributed"],"out":["identifies","rogue","unsanctioned","assets","maps","relationships","data","models","agents","tools"]},{"cs":1,"pp":4,"concern":"We're running AI workloads in cloud accounts, but we don't have a reliable way to see which models and AI assets are actually in use. We're also concerned about","primary":["ai defense","multicloud defense"],"alts":["hypershield"],"feat":["runtime","protection"],"req":["seeing","assets","third","party","model","usage","enforcing","runtime","guardrails","traffic"],"how":["exactly","defense","multicloud","integration","designed","address","uses","discover","assets","cloud"],"out":["finds","assets","cloud","accounts","identifies","third","party","model","usage"]},{"cs":2,"pp":1,"concern":"If a breach occurs in one of our public cloud instances, we are terrified that the attacker will move laterally into our core on-premises systems. How can we co","primary":["multicloud defense"],"alts":["secure workload","hypershield"],"feat":["macro","micro","segmentation","gateways"],"req":["containing","lateral","movement","between","public","cloud","prem","multicloud","environment"],"how":["multicloud","defense","leverages","macro","micro","segmentation","capabilities","enforce","strict","communication"],"out":["granular","visibility","control","east","west","traffic","applying","zero","trust","principles"]},{"cs":2,"pp":2,"concern":"Our auditors require proof that our security controls are applied consistently across all our cloud workloads. Gathering this data from different cloud provider","primary":["multicloud defense"],"alts":["security cloud control"],"feat":["unified","logging","visibility"],"req":["consistent","auditable","proof","controls","applied","cloud","workloads"],"how":["multicloud","defense","unified","logging","traceability","because","framework","integrated","network","fabric"],"out":["automates","collection","evidence","audits","consolidating","logs","policy","enforcement","data","create"]},{"cs":2,"pp":3,"concern":"We have workloads spread across AWS, Azure, and on-premises data centers. Managing security policies individually in each cloud environment is creating massive ","primary":["multicloud defense"],"alts":["secure firewall","fmc or security cloud control"],"feat":["unified","policy","public","clouds"],"req":["consistent","policy","model","azure","prem","cloud","overhead"],"how":["multicloud","defense","integrated","hybrid","mesh","firewall","architecture","unified","control","plane"],"out":["replaces","siloed","manual","configuration","centralized","orchestration","abstracting","policy","cloud","native"]},{"cs":2,"pp":4,"concern":"We have workloads on-prem, in cloud, and in mixed environments, and policy consistency is becoming difficult. Every environment feels different, and we're worri","primary":["secure workload","secure firewall"],"alts":["multicloud defense","hypershield"],"feat":["managed","cloud","control"],"req":["unified","segmentation","prevents","policy","drift","hybrid","multicloud"],"how":["common","hybrid","environment","challenge","workload","create","unified","segmentation","model","application"],"out":["reduces","policy","drift","hybrid","multicloud","environments","aligns","application","behavior","just"]},{"cs":3,"pp":1,"concern":"When our security tools detect a compromised device, our manual response time is too slow. By the time we identify the user and manually isolate the port, the a","primary":["ise"],"alts":["secure firewall integrated","adaptive network control"],"feat":["group","tags","pxgrid","adaptive","network","control"],"req":["automated","time","isolation","compromised","device","faster","manual","response"],"how":["integrates","ecosystem","pxgrid","adaptive","network","control","threat","detected","automatically","trigger"],"out":["automates","response","phase","incident","lifecycle","bridging","between","detection","enforcement","stops"]},{"cs":3,"pp":2,"concern":"Our firewall environment has become too complex to manage manually.","primary":["security cloud control","fmc","secure firewall"],"alts":["secure firewall management center"],"feat":["unified","policy","administration"],"req":["simplifying","cleaning","firewall","policy","administration","scale"],"how":["applies","driven","analysis","firewall","telemetry","policy","data","surface","optimization","opportunities"],"out":["reduces","manual","policy","review","identifies","redundant","stale","rules","lowers","risk"]},{"cs":3,"pp":3,"concern":"Most of our traffic is encrypted, so we've lost visibility into a huge part of our environment.","primary":["secure firewall","encrypted visibility engine"],"alts":["selective tls decryption"],"feat":[],"req":["restoring","visibility","encrypted","traffic","decrypting","everything"],"how":["encrypted","visibility","engine","uses","based","fingerprinting","analyze","traffic","patterns","identify"],"out":["restores","visibility","encrypted","blind","spots","avoids","performance","privacy","overhead","decrypt"]},{"cs":3,"pp":4,"concern":"We're worried traditional signature-based detection won't catch new or unknown attacks quickly enough.","primary":["secure firewall","snort ml"],"alts":["talos backed ips","malware protection"],"feat":[],"req":["detecting","unknown","zero","threats","beyond","signature","based","detection"],"how":["exactly","snort","adds","machine","learning","based","detection","inside","engine","identify"],"out":["addresses","between","known","unknown","threat","detection","reduces","dependence","signature","timing"]},{"cs":4,"pp":1,"concern":"Network policy helps, but we also need to know what's happening at runtime inside the workload. We need better detection of suspicious behavior and policy viola","primary":["tetragon"],"alts":["secure workload","hypershield"],"feat":["ebpf","runtime"],"req":["runtime","detection","suspicious","behaviour","policy","violations","inside","workloads"],"how":["tetragon","comes","extends","value","cilium","providing","ebpf","based","runtime","threat"],"out":["adds","runtime","visibility","beyond","basic","network","controls","detects","suspicious","system"]},{"cs":4,"pp":2,"concern":"Our Kubernetes networking feels fragmented across clusters and environments. We're dealing with too many moving parts, inconsistent policies, and too much opera","primary":["cilium"],"alts":["hypershield"],"feat":["ebpf","kubernetes","networking","policy"],"req":["consistent","kubernetes","networking","policy","clusters","operational","complexity"],"how":["exactly","isovalent","cilium","modern","ebpf","based","kubernetes","networking","layer","consistent"],"out":["replaces","brittle","centric","networking","models","kubernetes","native","improves","consistency","dynamic"]},{"cs":4,"pp":3,"concern":"Right now we're stitching together separate tools for networking, security, and observability in Kubernetes, and it's creating too much overhead.","primary":["cilium","tetragon"],"alts":["hypershield","secure workload"],"feat":[],"req":["consolidating","kubernetes","networking","observability","reduce","tool","sprawl"],"how":["exactly","consolidation","opportunity","isovalent","addresses","cilium","networking","policy","tetragon","runtime"],"out":["consolidates","multiple","functions","reduces","tool","sprawl","operational","friction"]},{"cs":4,"pp":4,"concern":"We know we need microsegmentation, but we don't have enough visibility into east-west flows or application dependencies to create policy safely. We don't want t","primary":["secure workload"],"alts":["cilium","hubble"],"feat":["application","dependency","mapping"],"req":["mapping","east","west","flows","application","dependencies","segment","safely","breaking","applications"],"how":["biggest","reasons","customers","adopt","workload","deep","visibility","communication","application","dependency"],"out":["reveals","actual","application","communication","paths","reduces","risk","segmentation","causing","outages"]}]};
+const CATS=[["Solution Strategist",300,"strat"],["Solution Builder",200,"build"],["Solution Explorer",0,"explore"]];
+const LS_KEY="hmf-leaderboard-v1";
+const $=id=>document.getElementById(id);
+function catFor(total){ for(const c of CATS){ if(total>=c[1]) return c; } return CATS[CATS.length-1]; }
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- theme ---------- */
+(function(){
+  const saved=localStorage.getItem("hmf-theme");
+  if(saved) document.documentElement.setAttribute("data-theme",saved);
+  function isDark(){ const t=document.documentElement.getAttribute("data-theme"); return t? t==="dark" : matchMedia("(prefers-color-scheme:dark)").matches; }
+  function sync(){ const d=isDark(); $("themeTxt").textContent=d?"Light":"Dark"; $("themeIco").innerHTML=d?"&#9728;":"&#9789;"; }
+  sync();
+  $("themeBtn").addEventListener("click",()=>{ const d=isDark(); document.documentElement.setAttribute("data-theme",d?"light":"dark"); localStorage.setItem("hmf-theme",d?"light":"dark"); sync(); });
+})();
+
+/* ---------- file / text extraction ---------- */
+async function readDocx(buf){
+  const dv=new DataView(buf), bytes=new Uint8Array(buf), td=new TextDecoder();
+  let eocd=-1, lim=Math.max(0,bytes.length-22-65536);
+  for(let i=bytes.length-22;i>=lim;i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd=i; break; } }
+  if(eocd<0) throw new Error("That file is not a .docx (no ZIP record found).");
+  const cdOff=dv.getUint32(eocd+16,true), cdCnt=dv.getUint16(eocd+10,true);
+  let p=cdOff, target=null;
+  for(let n=0;n<cdCnt;n++){
+    if(dv.getUint32(p,true)!==0x02014b50) break;
+    const method=dv.getUint16(p+10,true), compSize=dv.getUint32(p+20,true);
+    const nameLen=dv.getUint16(p+28,true), extraLen=dv.getUint16(p+30,true), cmtLen=dv.getUint16(p+32,true);
+    const localOff=dv.getUint32(p+42,true);
+    const name=td.decode(bytes.subarray(p+46,p+46+nameLen));
+    if(name==="word/document.xml"){ target={method,compSize,localOff}; break; }
+    p+=46+nameLen+extraLen+cmtLen;
+  }
+  if(!target) throw new Error("Could not find the document text inside the .docx.");
+  const lo=target.localOff;
+  const lName=dv.getUint16(lo+26,true), lExtra=dv.getUint16(lo+28,true);
+  const start=lo+30+lName+lExtra;
+  const comp=bytes.subarray(start,start+target.compSize);
+  let xmlBytes;
+  if(target.method===0){ xmlBytes=comp; }
+  else{
+    if(typeof DecompressionStream==="undefined") throw new Error("This browser can't read .docx here. Paste the answers or upload a .txt.");
+    const ds=new DecompressionStream("deflate-raw");
+    const stream=new Blob([comp]).stream().pipeThrough(ds);
+    xmlBytes=new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  return xmlToText(td.decode(xmlBytes));
+}
+function xmlToText(xml){
+  return xml.replace(/<\/w:p>/g,"\n").replace(/<w:tab[^>]*>/g," ").replace(/<[^>]+>/g," ")
+    .replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&apos;/g,"'").replace(/&quot;/g,'"')
+    .replace(/[ \t]+/g," ").replace(/\n{2,}/g,"\n").trim();
+}
+async function fileToText(file){
+  const name=(file.name||"").toLowerCase();
+  if(name.endsWith(".docx")) return await readDocx(await file.arrayBuffer());
+  return await file.text();
+}
+
+/* ---------- scoring ---------- */
+function has(text,phrase){
+  if(phrase.length<=4){ return new RegExp("\\b"+phrase.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\$&")+"\\b").test(text); }
+  return text.includes(phrase);
+}
+function overlap(text,kws){ if(!kws.length) return 0; let c=0; for(const k of kws){ if(text.includes(k)) c++; } return c/kws.length; }
+function scorePP(chunk,key){
+  const text=(chunk||"").toLowerCase();
+  if(text.replace(/[^a-z0-9]/g,"").length<8) return {problem:0,design:0,value:0,total:0};
+  const feat=key.feat.some(k=>text.includes(k));
+  let design;
+  if(key.primary.some(ph=>has(text,ph))) design=feat?10:7;         // right product (+capability = full)
+  else if(key.alts.some(ph=>has(text,ph))) design=feat?9:7;         // acceptable alternative
+  else if(feat) design=4;                                            // capability described, product not named
+  else if(/\bfirewall\b|\bdefense\b|\bworkload\b|\bhypershield\b|\bcilium\b|\btetragon\b|\bise\b/.test(text)) design=2;
+  else design=0;
+  const po=overlap(text,key.req);
+  const problem = po>=0.4?5: po>=0.25?4: po>=0.12?2: po>0?1:0;
+  const ho=overlap(text,key.how), ot=overlap(text,key.out), long=text.length>70;
+  let value;                                                         // needs both how and outcome for full
+  if(long && ho>=0.28 && ot>=0.22) value=9;
+  else if(Math.max(ho,ot)>=0.3) value=6;
+  else if(Math.max(ho,ot)>=0.15) value=4;
+  else if(ho+ot>0) value=2;
+  else value=0;
+  return {problem,design,value,total:problem+design+value};
+}
+function segment(text){
+  const chunks=Array.from({length:16},()=>"");
+  const csRe=/case\s*study\s*([1-4])/gi; let m, cs=[];
+  while((m=csRe.exec(text))) cs.push({n:+m[1],idx:m.index});
+  for(let k=0;k<cs.length;k++){
+    const body=text.slice(cs[k].idx, k+1<cs.length?cs[k+1].idx:text.length);
+    const ppRe=/pain\s*point\s*([1-4])/gi; let pm, pps=[];
+    while((pm=ppRe.exec(body))) pps.push({n:+pm[1],idx:pm.index});
+    for(let j=0;j<pps.length;j++){
+      const csn=cs[k].n, ppn=pps[j].n;
+      if(csn>=1&&csn<=4&&ppn>=1&&ppn<=4){
+        chunks[(csn-1)*4+(ppn-1)]=body.slice(pps[j].idx, j+1<pps.length?pps[j+1].idx:body.length);
+      }
+    }
+  }
+  return chunks;
+}
+function scoreAll(text){
+  const chunks=segment(text);
+  const pp=SCOREKEY.pp.map((k,i)=>scorePP(chunks[i],k));
+  const cs=[0,0,0,0]; pp.forEach((r,i)=>{ cs[Math.floor(i/4)]+=r.total; });
+  const parsed=chunks.filter(c=>c && c.replace(/[^a-z0-9]/g,"").length>=8).length;
+  return {pp,cs,total:cs.reduce((a,b)=>a+b,0),parsed};
+}
+
+/* ---------- score panel ---------- */
+let lastText="";
+function setStatus(msg,cls){ const s=$("status"); s.textContent=msg; s.className="status"+(cls?" "+cls:""); }
+async function ingestFile(file){
+  try{
+    setStatus("Reading "+file.name+"\u2026");
+    const txt=await fileToText(file);
+    lastText=txt; $("paste").value=txt;
+    if(!$("team").value.trim()){ const mt=txt.match(/team[:\s]+([A-Za-z0-9][\w '&-]{1,40})/i); if(mt) $("team").value=mt[1].trim(); }
+    setStatus("Loaded "+file.name+" \u00b7 "+txt.length.toLocaleString()+" characters. Ready to score.","ok");
+  }catch(e){ setStatus(e.message||"Could not read that file.","err"); }
+}
+$("drop").addEventListener("click",()=>$("file").click());
+$("drop").addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("file").click(); }});
+$("file").addEventListener("change",e=>{ if(e.target.files[0]) ingestFile(e.target.files[0]); });
+["dragover","dragenter"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.remove("drag");}));
+$("drop").addEventListener("drop",e=>{ if(e.dataTransfer.files[0]) ingestFile(e.dataTransfer.files[0]); });
+$("paste").addEventListener("input",()=>{ lastText=$("paste").value; });
+
+let current=null; // {cs:[4], total}
+function renderResults(res){
+  const rows=res.cs.map((v,i)=>{
+    const ppTotals=res.pp.slice(i*4,i*4+4).map(r=>r.total);
+    return `<div class="csrow">
+      <div><div class="nm">Case Study ${i+1}</div><div class="bd2 num">Pain points ${ppTotals.join(" &middot; ")} &middot; auto</div></div>
+      <div class="sc"><input type="number" class="num" min="0" max="100" step="1" data-cs="${i}" value="${v}" aria-label="Case Study ${i+1} score out of 100" /><span class="out">/100</span></div>
+    </div>`;
+  }).join("");
+  $("csrows").innerHTML=rows;
+  $("csrows").querySelectorAll("input").forEach(inp=>inp.addEventListener("input",recalc));
+  recalc();
+  $("results").classList.add("show");
+  const missing=16-res.parsed;
+  $("parseNote").innerHTML = res.parsed===0
+    ? "Couldn't find the Case Study / Pain Point structure in this text, so every section is 0. Check the answers were included, or set the section scores by hand."
+    : (missing>0
+        ? `Read ${res.parsed} of 16 pain points. Sections that couldn't be parsed scored low, so review and adjust before saving.`
+        : "Auto-scored all 16 pain points from the rubric. Adjust any section, then save.");
+}
+function recalc(){
+  const vals=[...$("csrows").querySelectorAll("input")].map(i=>Math.max(0,Math.min(100,+i.value||0)));
+  const total=vals.reduce((a,b)=>a+b,0);
+  const c=catFor(total);
+  current={cs:vals,total};
+  $("total").textContent=total;
+  $("cat").className="chip "+c[2]; $("catName").textContent=c[0];
+  $("saveBtn").disabled = !($("team").value.trim() && total>=0 && current);
+}
+$("team").addEventListener("input",()=>{ if(current) $("saveBtn").disabled=!$("team").value.trim(); });
+$("scoreBtn").addEventListener("click",()=>{
+  const text=($("paste").value||lastText||"").trim();
+  if(!text){ setStatus("Add the team's Workbook first, by file or paste.","warn"); return; }
+  renderResults(scoreAll(text));
+  if(!$("status").textContent) setStatus("");
+});
+
+/* ---------- leaderboard ---------- */
+function load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch(e){ return []; } }
+function save(rows){ localStorage.setItem(LS_KEY,JSON.stringify(rows)); }
+function renderBoard(){
+  const rows=load().sort((a,b)=>b.total-a.total);
+  $("lbCount").textContent=rows.length?("("+rows.length+")"):"";
+  $("empty").style.display=rows.length?"none":"block";
+  $("lb").style.display=rows.length?"":"none";
+  $("lbBody").innerHTML=rows.map((r,i)=>{
+    const c=catFor(r.total), medal=i<3?" m"+(i+1):"";
+    return `<tr>
+      <td class="l"><span class="rank${medal} num">${i+1}</span></td>
+      <td class="l"><span class="team">${esc(r.team)}</span></td>
+      ${r.cs.map(v=>`<td class="num">${v}</td>`).join("")}
+      <td class="tot num">${r.total}</td>
+      <td class="l"><span class="chip ${c[2]}"><span class="dot"></span>${esc(c[0])}</span></td>
+      <td><button class="del" title="Remove ${esc(r.team)}" data-ts="${r.ts}" aria-label="Remove ${esc(r.team)}">&times;</button></td>
+    </tr>`;
+  }).join("");
+  $("lbBody").querySelectorAll(".del").forEach(b=>b.addEventListener("click",()=>{
+    save(load().filter(x=>String(x.ts)!==b.dataset.ts)); renderBoard();
+  }));
+}
+$("saveBtn").addEventListener("click",()=>{
+  const team=$("team").value.trim(); if(!team||!current) return;
+  const rows=load();
+  const rec={team,cs:current.cs.slice(),total:current.total,ts:Date.now()};
+  const ix=rows.findIndex(r=>r.team.toLowerCase()===team.toLowerCase());
+  if(ix>=0){ if(!confirm(`"${team}" is already on the leaderboard. Replace its score?`)) return; rows[ix]=rec; }
+  else rows.push(rec);
+  save(rows); renderBoard();
+  // reset for next team
+  $("team").value=""; $("paste").value=""; lastText=""; current=null;
+  $("results").classList.remove("show"); $("file").value="";
+  setStatus("Saved \u201c"+team+"\u201d to the leaderboard. Next team\u2026","ok");
+  $("team").focus();
+});
+$("clearBtn").addEventListener("click",()=>{ if(load().length && confirm("Clear the whole leaderboard on this device?")){ save([]); renderBoard(); }});
+$("csvBtn").addEventListener("click",async()=>{
+  const rows=load().sort((a,b)=>b.total-a.total);
+  if(!rows.length){ return; }
+  const head=["Rank","Team","Case Study 1","Case Study 2","Case Study 3","Case Study 4","Cumulative","Grade"];
+  const csv=[head.join(",")].concat(rows.map((r,i)=>[i+1,`"${r.team.replace(/"/g,'""')}"`,...r.cs,r.total,`"${catFor(r.total)[0]}"`].join(","))).join("\r\n");
+  const filename="HMF-leaderboard.csv";
+  try{
+    if(window.claude&&window.claude.downloads&&window.claude.downloads.save){
+      await window.claude.downloads.save({filename,data:csv}); return;
+    }
+  }catch(e){/* fall through to blob */}
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download=filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+});
+
+renderBoard();
+</script>
+
+</body>
+</html>
