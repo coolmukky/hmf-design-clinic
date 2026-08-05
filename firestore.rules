@@ -60,15 +60,17 @@ service cloud.firestore {
     }
 
     // Standalone Team Scoring tool (tools/HMF-Scoring-Tool.html): shared leaderboard.
-    // Kept separate from the app's collections. Facilitator tool, so remove/clear
-    // is allowed for this collection only.
+    // Kept separate from the app's collections. Reads stay open so the board renders;
+    // writes and deletes require a signed-in identity (the tool signs in anonymously),
+    // which blocks unauthenticated direct-API tampering. Enable Anonymous sign-in in
+    // Firebase Auth for this to work; otherwise the tool falls back to an on-device board.
     match /leaderboard/{id} {
       allow read: if true;
-      allow create, update: if
+      allow create, update: if request.auth != null &&
         request.resource.data.team is string &&
         request.resource.data.team.size() < 120 &&
         request.resource.data.total is number;
-      allow delete: if true;
+      allow delete: if request.auth != null;
     }
   }
 }

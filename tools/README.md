@@ -36,9 +36,12 @@ so use the **hosted** page (GitHub Pages) or open the file locally, not a locked
 ## Hosting
 - **Locally**: open the file in any modern browser (Chrome, Edge, Safari, Firefox).
 - **Online**: drop it on the GitHub Pages site. The leaderboard is shared via Firebase
-  (project `hmf-clinic-80732`, `leaderboard` collection). Publish the `leaderboard` rule
-  block from `firestore.rules` once (Firebase Console, Firestore, Rules, Publish) so writes
-  are allowed. If Firebase is unreachable, the page falls back to an on-device leaderboard.
+  (project `hmf-clinic-80732`, `leaderboard` collection). Two one-time Firebase steps:
+  (1) **Authentication, Sign-in method, enable Anonymous** — the tool signs in anonymously
+  so writes/deletes carry an identity; (2) publish the `leaderboard` rule block from
+  `firestore.rules` (Firestore, Rules, Publish), which requires that identity. Enable
+  Anonymous sign-in first, or the tightened rule sends writes to the on-device fallback.
+  If Firebase is unreachable, the page falls back to an on-device leaderboard automatically.
 
 ## Facilitator passcode
 The page embeds the answer key, so it opens on a **passcode gate**. The key and the AI
