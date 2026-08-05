@@ -58,5 +58,17 @@ service cloud.firestore {
       allow create, update: if request.resource.data.teamName is string;
       allow delete: if false;
     }
+
+    // Standalone Team Scoring tool (tools/HMF-Scoring-Tool.html): shared leaderboard.
+    // Kept separate from the app's collections. Facilitator tool, so remove/clear
+    // is allowed for this collection only.
+    match /leaderboard/{id} {
+      allow read: if true;
+      allow create, update: if
+        request.resource.data.team is string &&
+        request.resource.data.team.size() < 120 &&
+        request.resource.data.total is number;
+      allow delete: if true;
+    }
   }
 }
