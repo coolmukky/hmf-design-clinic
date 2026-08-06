@@ -25,13 +25,25 @@ requirement and value text against the model answer. It is a fast, deterministic
 to start from, not a final grade. The embedded answer key is generated from the same
 content as the rest of the pack, so it stays in sync with the rubric.
 
-## How AI grading works
-Open **Grade with AI**, paste an Anthropic API key, pick a model, and grade. The key is
-held in this browser tab only (sessionStorage), sent straight to Anthropic, and is never
-saved to disk or uploaded anywhere. The request carries the same rubric and answer key as
-`HMF-LLM-Grading-Prompt.md` and returns a rubric-aligned score plus feedback, which you can
-still adjust before saving. AI grading and the shared leaderboard both need outbound network,
-so use the **hosted** page (GitHub Pages) or open the file locally, not a locked-down sandbox.
+## AI grading — two modes
+Both send the same rubric and answer key (the `HMF-LLM-Grading-Prompt.md` content the tool
+decrypts on unlock) and return a rubric-aligned score plus feedback you can still adjust
+before saving.
+
+- **Paste-key (default, no setup):** open **Grade with AI**, paste an Anthropic API key,
+  pick a model, grade. The key stays in this browser tab only (sessionStorage), goes straight
+  to Anthropic, and is never saved to disk or uploaded. Good when one or two proctors grade.
+- **Server (no key in the browser):** deploy the Cloudflare worker so the key lives server-side
+  and every proctor can grade without pasting anything:
+  1. `wrangler secret put ANTHROPIC_API_KEY` (paste your key), then `wrangler deploy`
+     (`ai-eval-worker.js` + `wrangler.toml`; `ALLOW_ORIGIN` is already set to the Pages origin).
+  2. Rebuild the tool with the worker URL: `HMF_AI_ENDPOINT="https://hmf-ai-eval.<you>.workers.dev" node build-scoretool.js`
+     (add `HMF_AI_TOKEN="…"` if you also set `EVAL_SHARED_TOKEN` on the worker as a light abuse guard).
+  The tool then grades through the worker (its `mode:"workbook"` path), the API-key box hides
+  automatically, and proctors just click **Grade with AI**.
+
+AI grading and the shared leaderboard both need outbound network, so use the **hosted** page
+(GitHub Pages) or open the file locally — not a locked-down sandbox.
 
 ## Hosting
 - **Locally**: open the file in any modern browser (Chrome, Edge, Safari, Firefox).

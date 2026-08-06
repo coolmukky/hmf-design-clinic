@@ -26,7 +26,7 @@
      { total, rationale, model }
    ========================================================================== */
 
-const ALLOWED_MODELS = ["claude-opus-4-8", "claude-sonnet-5", "claude-haiku-4-5-20251001"];
+const ALLOWED_MODELS = ["claude-opus-5", "claude-opus-4-8", "claude-sonnet-5", "claude-haiku-4-5-20251001"];
 const DEFAULT_MODEL = "claude-opus-4-8";
 
 export default {
@@ -52,8 +52,10 @@ export default {
     if (env.EVAL_SHARED_TOKEN && request.headers.get("x-eval-token") !== env.EVAL_SHARED_TOKEN)
       return json({ error: "unauthorized" }, 401, cors);
 
-    // Whole-document grading: a team's uploaded worksheet graded against the answer sheet across all use cases.
+    // Whole-document grading (Solution Grader): a team's worksheet graded across all use cases.
     if (body.mode === "document") return gradeDocument(body, env, model, cors);
+    // Whole-workbook grading (Team Scoring tool): four case studies graded against the rubric the tool sends.
+    if (body.mode === "workbook") return gradeWorkbook(body, env, model, cors);
 
     const max = clampInt(body.rubricMax, 1, 1000) || 100;
 
@@ -91,7 +93,7 @@ export default {
           "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
-          model, max_tokens: 1024, system,
+          model, max_tokens: 1024, thinking: { type: "disabled" }, system,
           tools: [tool], tool_choice: { type: "tool", name: "submit_score" },
           messages: [{ role: "user", content: [{ type: "text", text: buildUserText(body, max) }] }],
         }),
@@ -174,7 +176,7 @@ async function gradeDocument(body, env, model, cors) {
     ar = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model, max_tokens: 1500, system, tools: [tool], tool_choice: { type: "tool", name: "submit_doc_score" }, messages: [{ role: "user", content: [{ type: "text", text: userText }] }] }),
+      body: JSON.stringify({ model, max_tokens: 1500, thinking: { type: "disabled" }, system, tools: [tool], tool_choice: { type: "tool", name: "submit_doc_score" }, messages: [{ role: "user", content: [{ type: "text", text: userText }] }] }),
     });
   } catch (e) {
     return json({ error: "could not reach Anthropic API", detail: String(e && e.message || e) }, 502, cors);
@@ -190,6 +192,72 @@ async function gradeDocument(body, env, model, cors) {
   });
   const total = perUseCase.reduce(function (s, u) { return s + u.score; }, 0);
   return json({ perUseCase: perUseCase, total: total, totalMax: totalMax, rationale: String(use.input.rationale || ""), model: model }, 200, cors);
+}
+
+/* ---- whole-workbook grading (Team Scoring tool) -------------------------- */
+/* The tool holds the rubric + answer key (decrypted after the facilitator passcode)
+   and sends it as gradingContext, so the key stays out of this worker's code.
+   Returns the same shape the tool's paste-key path returns, so applyAI() is unchanged. */
+async function gradeWorkbook(body, env, model, cors) {
+  const gradingContext = String(body.gradingContext || "");
+  const submission = String(body.submissionText || "");
+  if (!submission.trim()) return json({ error: "no submission text provided" }, 400, cors);
+  if (!gradingContext.trim()) return json({ error: "no grading context provided" }, 400, cors);
+
+  const tool = {
+    name: "submit_grades",
+    description: "Return the graded scores for the four case studies against the rubric.",
+    input_schema: {
+      type: "object",
+      properties: {
+        case_studies: {
+          type: "array",
+          description: "Exactly four entries, one per case study.",
+          items: {
+            type: "object",
+            properties: {
+              case_study: { type: "integer", description: "1 to 4" },
+              score_out_of_100: { type: "integer", minimum: 0, maximum: 100, description: "Sum of the four pain points" },
+              feedback: { type: "string", description: "One or two sentences, constructive and specific to Cedarline." },
+            },
+            required: ["case_study", "score_out_of_100", "feedback"],
+          },
+        },
+        overall_grade: { type: "string", description: "Solution Strategist, Solution Builder or Solution Explorer" },
+        what_the_team_did_well: { type: "string" },
+        where_they_can_grow: { type: "string" },
+      },
+      required: ["case_studies", "overall_grade", "what_the_team_did_well", "where_they_can_grow"],
+    },
+  };
+
+  const userText = gradingContext +
+    "\n\n--- BEGIN TEAM SUBMISSION ---\n" + submission.slice(0, 45000) +
+    "\n--- END TEAM SUBMISSION ---\n\n" +
+    "Grade strictly against the rubric and answer key above. Score each pain point on the three dimensions, add them for each case study out of 100, and call submit_grades with the four case study scores and short, encouraging, specific feedback.";
+
+  let ar;
+  try {
+    ar = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model, max_tokens: 2000, thinking: { type: "disabled" }, tools: [tool], tool_choice: { type: "tool", name: "submit_grades" }, messages: [{ role: "user", content: [{ type: "text", text: userText }] }] }),
+    });
+  } catch (e) {
+    return json({ error: "could not reach Anthropic API", detail: String(e && e.message || e) }, 502, cors);
+  }
+  if (!ar.ok) { const t = await ar.text(); return json({ error: "model API error (" + ar.status + ")", detail: t.slice(0, 600) }, 502, cors); }
+  const data = await ar.json();
+  const use = (data.content || []).find(function (b) { return b.type === "tool_use"; });
+  if (!use || !use.input || !Array.isArray(use.input.case_studies)) return json({ error: "model returned no structured grades" }, 502, cors);
+  const g = use.input;
+  return json({
+    case_studies: g.case_studies,
+    overall_grade: String(g.overall_grade || ""),
+    what_the_team_did_well: String(g.what_the_team_did_well || ""),
+    where_they_can_grow: String(g.where_they_can_grow || ""),
+    model: model,
+  }, 200, cors);
 }
 
 function buildUserText(body, max) {
