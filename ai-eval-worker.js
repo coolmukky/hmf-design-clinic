@@ -260,6 +260,7 @@ async function gradeWorkbook(body, env, model, cors) {
     where_they_can_grow: String(g.where_they_can_grow || ""),
     topology_present: !!g.topology_present,
     topology_note: String(g.topology_note || ""),
+    usage: data.usage || null,
     model: model,
   }, 200, cors);
 }
