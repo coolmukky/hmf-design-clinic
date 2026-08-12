@@ -25,6 +25,27 @@
     --border:#e1e8f1; --line:#eef2f7; --accent:#036c8f; --accent2:#00bceb; --navy:#0d274d;
     --strat:#0e7c86; --strat-bg:#e5f5f4; --build:#0b6e9e; --build-bg:#e6f2f9; --explore:#5a6b82; --explore-bg:#eef1f6;
     --good:#0e9e6e; --shadow:0 1px 2px rgba(13,39,77,.06),0 10px 30px rgba(13,39,77,.07); }
+  /* Arcade — optional CRT "high score" skin (projector default) */
+  :root[data-theme="arcade"]{ --bg:#0b0817; --surface:#160f2b; --surface2:#1e1440; --ink:#f4f1ff; --body:#cfc9f0; --muted:#9a95c4;
+    --border:#2c2058; --line:#241a48; --accent:#22d3ee; --accent2:#ff3ca6; --navy:#0b0817;
+    --strat:#ffd23f; --strat-bg:#241a3f; --build:#22d3ee; --build-bg:#12243f; --explore:#9dff4d; --explore-bg:#15271a;
+    --good:#9dff4d; --shadow:5px 5px 0 rgba(0,0,0,.5); --radius:0; }
+  :root[data-theme="arcade"] body{font-family:ui-monospace,"SFMono-Regular","Cascadia Mono",Menlo,Consolas,"Liberation Mono",monospace}
+  :root[data-theme="arcade"] body::after{content:"";position:fixed;inset:0;z-index:59;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px),radial-gradient(120% 90% at 50% 25%,transparent 60%,rgba(0,0,0,.4) 100%)}
+  :root[data-theme="arcade"] .brand h1{text-transform:uppercase;letter-spacing:.05em;color:var(--strat);text-shadow:0 3px 0 #7a4600,3px 4px 0 rgba(0,0,0,.5)}
+  :root[data-theme="arcade"] .mark{filter:drop-shadow(0 0 8px var(--accent))}
+  :root[data-theme="arcade"] .tm,:root[data-theme="arcade"] .pcard .team{text-transform:uppercase;letter-spacing:.03em}
+  :root[data-theme="arcade"] .chip,:root[data-theme="arcade"] .pill{border-radius:0;background:transparent;border:1px solid currentColor;text-transform:uppercase;letter-spacing:.06em}
+  :root[data-theme="arcade"] .rank,:root[data-theme="arcade"] .pcard .rk{border-radius:0;background:transparent;border:1px solid var(--muted);color:var(--muted)}
+  :root[data-theme="arcade"] .rank.m1,:root[data-theme="arcade"] .pcard.p1 .rk{border-color:#ffd23f;color:#ffd23f}
+  :root[data-theme="arcade"] .rank.m2,:root[data-theme="arcade"] .pcard.p2 .rk{border-color:#c9d3e0;color:#c9d3e0}
+  :root[data-theme="arcade"] .rank.m3,:root[data-theme="arcade"] .pcard.p3 .rk{border-color:#e0a15a;color:#e0a15a}
+  :root[data-theme="arcade"] .pcard.p1{border-color:#ffd23f}
+  :root[data-theme="arcade"] .pcard.p1 .tot{color:#ffd23f} :root[data-theme="arcade"] .pcard.p2 .tot{color:#c9d3e0} :root[data-theme="arcade"] .pcard.p3 .tot{color:#e0a15a}
+  :root[data-theme="arcade"] .btn{border-radius:0;box-shadow:3px 3px 0 rgba(0,0,0,.5);text-transform:uppercase;letter-spacing:.05em}
+  :root[data-theme="arcade"] .btn.on{color:#052a33}
+  :root[data-theme="arcade"] .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 rgba(0,0,0,.5)}
   *{box-sizing:border-box} html,body{margin:0}
   body{background:var(--bg);color:var(--body);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
   body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent));z-index:60}
@@ -94,6 +115,9 @@
 </style>
 </head>
 <body>
+<script>/* set theme before paint to avoid a flash; leaderboard defaults to Arcade for the projector */
+(function(){try{var t=localStorage.getItem("hmf-lb-theme");var ok=["arcade","light","dark"];
+document.documentElement.setAttribute("data-theme",ok.indexOf(t)>=0?t:"arcade");}catch(e){document.documentElement.setAttribute("data-theme","arcade");}})();</script>
 <div class="wrap">
   <header class="top">
     <div class="brand">
@@ -162,12 +186,15 @@ const $=id=>document.getElementById(id);
 const catFor=t=>{ for(const c of CATS){ if(t>=c[1]) return c; } return CATS[CATS.length-1]; };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* theme */
+/* theme — 3-way cycle: Arcade (default) / Light / Dark */
 (function(){
-  const saved=localStorage.getItem("hmf-theme"); if(saved) document.documentElement.setAttribute("data-theme",saved);
-  const isDark=()=>{ const t=document.documentElement.getAttribute("data-theme"); return t? t==="dark" : matchMedia("(prefers-color-scheme:dark)").matches; };
-  const sync=()=>{ $("themeIco").innerHTML=isDark()?"&#9728;":"&#9789;"; }; sync();
-  $("themeBtn").addEventListener("click",()=>{ const d=isDark(); document.documentElement.setAttribute("data-theme",d?"light":"dark"); localStorage.setItem("hmf-theme",d?"light":"dark"); sync(); });
+  const THEMES=["arcade","light","dark"], KEY="hmf-lb-theme";
+  const ico=t=>t==="arcade"?"&#9632;":t==="light"?"&#9728;":"&#9789;";
+  const cur=()=>document.documentElement.getAttribute("data-theme")||"arcade";
+  const apply=t=>{ document.documentElement.setAttribute("data-theme",t); try{localStorage.setItem(KEY,t);}catch(e){}
+    $("themeIco").innerHTML=ico(t); $("themeBtn").title="Theme: "+t[0].toUpperCase()+t.slice(1)+" — click to change"; };
+  apply(cur());
+  $("themeBtn").addEventListener("click",()=>{ const i=THEMES.indexOf(cur()); apply(THEMES[(i+1)%THEMES.length]); });
 })();
 
 /* auto-scroll for projector display */
