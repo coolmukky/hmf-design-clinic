@@ -78,6 +78,8 @@
   .tm{font-weight:700;color:var(--ink)}
   .mem{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.35;white-space:normal;max-width:340px}
   .pcard .mem{margin-top:6px}
+  .dmark{font-size:14px;vertical-align:middle;cursor:help}
+  .dmark.yes{color:var(--good)} .dmark.no{color:var(--muted);opacity:.55}
   .aitag{font-size:10px;font-weight:800;color:var(--muted);margin-left:7px;vertical-align:middle}
   .flash{animation:flash 1.6s ease-out}
   @keyframes flash{0%{background:color-mix(in srgb,var(--accent2) 22%,transparent)}100%{background:transparent}}
@@ -169,7 +171,12 @@ $("scrollBtn").addEventListener("click",()=>{
 
 /* render */
 let prevKeys=new Set();
-function normalize(rows){ return rows.map(r=>({ team:String(r.team||"Team"), members:String(r.members||""), cs:(r.cs||[]).slice(0,4).map(n=>+n||0), total:+r.total||0, ts:+r.ts||0, ai:!!r.ai })); }
+function normalize(rows){ return rows.map(r=>({ team:String(r.team||"Team"), members:String(r.members||""), cs:(r.cs||[]).slice(0,4).map(n=>+n||0), total:+r.total||0, ts:+r.ts||0, ai:!!r.ai, diagram:!!r.diagram, diagramImages:+r.diagramImages||0 })); }
+function diagMark(r){
+  const title = r.diagramImages>0 ? ("Topology diagram embedded ("+r.diagramImages+" image"+(r.diagramImages!==1?"s":"")+")")
+    : r.diagram ? "Topology described in the submission" : "No topology diagram detected";
+  return '<span class="dmark '+(r.diagram?"yes":"no")+'" title="'+esc(title)+'">'+(r.diagram?"◈":"◇")+'</span>';
+}
 function setPill(state,txt){ $("pill").className="pill "+state; $("pillTxt").textContent=txt; }
 function render(rows){
   rows=normalize(rows).sort((a,b)=> b.total-a.total || a.ts-b.ts || a.team.localeCompare(b.team));
@@ -180,7 +187,7 @@ function render(rows){
   $("podium").innerHTML=rows.slice(0,3).map((r,i)=>{
     const c=catFor(r.total);
     return `<div class="pcard p${i+1}"><span class="rk num">${i+1}</span>
-      <div class="team">${esc(r.team)}</div>
+      <div class="team">${esc(r.team)} ${diagMark(r)}</div>
       ${r.members?`<div class="mem">${esc(r.members)}</div>`:''}
       <div class="tot num">${r.total} <small>/ 400</small></div>
       <span class="chip ${c[2]}"><span class="dot"></span>${esc(c[0])}</span></div>`;
@@ -192,7 +199,7 @@ function render(rows){
     keys.add(k); const isNew=!prevKeys.has(k)&&prevKeys.size>0;
     return `<tr class="${isNew?"flash":""}">
       <td class="l"><span class="rank${medal} num">${i+1}</span></td>
-      <td class="l"><span class="tm">${esc(r.team)}</span>${r.ai?'<span class="aitag">AI</span>':''}${r.members?`<div class="mem">${esc(r.members)}</div>`:''}</td>
+      <td class="l"><span class="tm">${esc(r.team)}</span>${r.ai?'<span class="aitag">AI</span>':''} ${diagMark(r)}${r.members?`<div class="mem">${esc(r.members)}</div>`:''}</td>
       ${r.cs.map(v=>`<td class="num">${v}</td>`).join("")}
       <td class="tot num">${r.total}</td>
       <td class="l"><span class="chip ${c[2]}"><span class="dot"></span>${esc(c[0])}</span></td>
