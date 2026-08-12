@@ -226,15 +226,17 @@ async function gradeWorkbook(body, env, model, cors) {
         overall_grade: { type: "string", description: "Solution Strategist, Solution Builder or Solution Explorer" },
         what_the_team_did_well: { type: "string" },
         where_they_can_grow: { type: "string" },
+        topology_present: { type: "boolean", description: "True only if the submission includes or clearly describes a network topology or architecture diagram (judge from the text only)." },
+        topology_note: { type: "string", description: "One short line: what topology/architecture is present, or that none was described in the text." },
       },
-      required: ["case_studies", "overall_grade", "what_the_team_did_well", "where_they_can_grow"],
+      required: ["case_studies", "overall_grade", "what_the_team_did_well", "where_they_can_grow", "topology_present", "topology_note"],
     },
   };
 
   const userText = gradingContext +
     "\n\n--- BEGIN TEAM SUBMISSION ---\n" + submission.slice(0, 45000) +
     "\n--- END TEAM SUBMISSION ---\n\n" +
-    "Grade strictly against the rubric and answer key above. Score each pain point on the three dimensions, add them for each case study out of 100, and call submit_grades with the four case study scores and short, encouraging, specific feedback.";
+    "Grade strictly against the rubric and answer key above. Score each pain point on the three dimensions, add them for each case study out of 100. Also judge, from the text only, whether the team included or clearly described a network topology or architecture diagram (set topology_present and topology_note). Then call submit_grades with the four case study scores and short, encouraging, specific feedback.";
 
   let ar;
   try {
@@ -256,6 +258,8 @@ async function gradeWorkbook(body, env, model, cors) {
     overall_grade: String(g.overall_grade || ""),
     what_the_team_did_well: String(g.what_the_team_did_well || ""),
     where_they_can_grow: String(g.where_they_can_grow || ""),
+    topology_present: !!g.topology_present,
+    topology_note: String(g.topology_note || ""),
     model: model,
   }, 200, cors);
 }

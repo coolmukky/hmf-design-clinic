@@ -76,6 +76,8 @@
   :root[data-theme="dark"] .rank.m1{background:#4a3d13;color:#f2d585} :root[data-theme="dark"] .rank.m2{background:#2b3444;color:#c9d3e0} :root[data-theme="dark"] .rank.m3{background:#3d2a1c;color:#e0b48c}
   @media (prefers-color-scheme:dark){ .rank.m1{background:#4a3d13;color:#f2d585} .rank.m2{background:#2b3444;color:#c9d3e0} .rank.m3{background:#3d2a1c;color:#e0b48c} }
   .tm{font-weight:700;color:var(--ink)}
+  .mem{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.35;white-space:normal;max-width:340px}
+  .pcard .mem{margin-top:6px}
   .aitag{font-size:10px;font-weight:800;color:var(--muted);margin-left:7px;vertical-align:middle}
   .flash{animation:flash 1.6s ease-out}
   @keyframes flash{0%{background:color-mix(in srgb,var(--accent2) 22%,transparent)}100%{background:transparent}}
@@ -167,7 +169,7 @@ $("scrollBtn").addEventListener("click",()=>{
 
 /* render */
 let prevKeys=new Set();
-function normalize(rows){ return rows.map(r=>({ team:String(r.team||"Team"), cs:(r.cs||[]).slice(0,4).map(n=>+n||0), total:+r.total||0, ts:+r.ts||0, ai:!!r.ai })); }
+function normalize(rows){ return rows.map(r=>({ team:String(r.team||"Team"), members:String(r.members||""), cs:(r.cs||[]).slice(0,4).map(n=>+n||0), total:+r.total||0, ts:+r.ts||0, ai:!!r.ai })); }
 function setPill(state,txt){ $("pill").className="pill "+state; $("pillTxt").textContent=txt; }
 function render(rows){
   rows=normalize(rows).sort((a,b)=> b.total-a.total || a.ts-b.ts || a.team.localeCompare(b.team));
@@ -179,6 +181,7 @@ function render(rows){
     const c=catFor(r.total);
     return `<div class="pcard p${i+1}"><span class="rk num">${i+1}</span>
       <div class="team">${esc(r.team)}</div>
+      ${r.members?`<div class="mem">${esc(r.members)}</div>`:''}
       <div class="tot num">${r.total} <small>/ 400</small></div>
       <span class="chip ${c[2]}"><span class="dot"></span>${esc(c[0])}</span></div>`;
   }).join("");
@@ -189,7 +192,7 @@ function render(rows){
     keys.add(k); const isNew=!prevKeys.has(k)&&prevKeys.size>0;
     return `<tr class="${isNew?"flash":""}">
       <td class="l"><span class="rank${medal} num">${i+1}</span></td>
-      <td class="l"><span class="tm">${esc(r.team)}</span>${r.ai?'<span class="aitag">AI</span>':''}</td>
+      <td class="l"><span class="tm">${esc(r.team)}</span>${r.ai?'<span class="aitag">AI</span>':''}${r.members?`<div class="mem">${esc(r.members)}</div>`:''}</td>
       ${r.cs.map(v=>`<td class="num">${v}</td>`).join("")}
       <td class="tot num">${r.total}</td>
       <td class="l"><span class="chip ${c[2]}"><span class="dot"></span>${esc(c[0])}</span></td>
