@@ -119,6 +119,12 @@
   /* score */
   .score-pill{display:inline-flex;align-items:baseline;gap:6px;font-family:"IBM Plex Mono";font-weight:600;background:var(--green-soft);border:1px solid #A9DEC9;color:#155c43;border-radius:20px;padding:5px 13px;font-size:13px}
   .score-pill b{font-size:16px}
+  /* observer entry + read-only mode */
+  .observe-row{text-align:center;margin:16px auto 0;max-width:620px}
+  .linklike{background:none;border:0;color:var(--cyan-deep);font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:8px}
+  .linklike:hover{background:var(--green-soft);background:rgba(0,188,235,.08)}
+  .obsnote{display:flex;align-items:center;gap:9px;background:rgba(0,188,235,.09);border:1px solid #A9DEF0;border-left:4px solid var(--cyan);border-radius:0 8px 8px 0;padding:10px 13px;margin:0 0 16px;font-size:13px;color:var(--cyan-deep);font-weight:600}
+  .tb-obs{font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.04em;color:#EAF1F8;background:rgba(0,188,235,.18);border:1px solid rgba(0,188,235,.5);border-radius:20px;padding:3px 11px}
   .score-pending{display:inline-flex;align-items:center;gap:8px;font-family:"IBM Plex Mono";font-size:12px;color:#8a560f;background:var(--amber-soft);border:1px solid #F0CE97;border-radius:20px;padding:5px 13px}
   .rationale{font-size:13px;color:var(--ink-soft);background:#F7F9FC;border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;margin-top:12px}
   .rationale b{color:var(--ink)}
@@ -184,6 +190,9 @@
         <div class="err" id="joinErr"></div>
         <div class="btn-row"><button class="btn cyan" id="btnJoin" type="button">Join team &rarr;</button></div>
       </div>
+    </div>
+    <div class="observe-row">
+      <button class="linklike" id="btnObserve" type="button">&#128065; Enter as an observer &mdash; view the clinic without a team</button>
     </div>
   </section>
 
@@ -308,7 +317,7 @@ function HMF_START(){
 
   /* ---------- state ---------- */
   var S = { room:"", teamCode:"", teamName:"", members:[], you:"", currentUC:0,
-            answers:{}, scores:{}, submitted:{} };
+            observer:false, answers:{}, scores:{}, submitted:{} };
   USECASES.forEach(function(uc){ S.answers[uc.id]={}; uc.concerns.forEach(function(c){ S.answers[uc.id][c.id]={product:"",se:""}; }); });
 
   /* room from ?room= (event code); default 'default' */
@@ -397,10 +406,24 @@ function HMF_START(){
     });
   });
 
+  /* ---------- observer entry (read-only, no team) ---------- */
+  $("#btnObserve").addEventListener("click",function(){
+    S.observer=true; S.teamName="Observer";
+    startSession();
+  });
+
   /* ---------- session ---------- */
   function startSession(){
     setSync();
     $("#tbTeam").hidden=false; $("#ucbar").hidden=false;
+    if(S.observer){
+      var tn=$("#tbTeamName"); tn.textContent="Observer"; tn.className="tb-obs";
+      $("#tbTeamCode").style.display="none";
+      $("#boardMount").innerHTML=BOARD_SVG;
+      renderUcBar();
+      show("scenario");
+      return;
+    }
     $("#tbTeamName").textContent=S.teamName;
     $("#tbTeamCode").textContent=S.teamCode;
     // live team watch (members can change)
@@ -439,7 +462,31 @@ function HMF_START(){
     });
   }
 
+  function renderUCObserver(){
+    var uc=USECASES[S.currentUC];
+    var html='';
+    html+='<div class="uc-head"><div class="uc-no">'+(S.currentUC+1)+'</div><div class="t"><small>Case Study '+(S.currentUC+1)+' of 4 · '+uc.tag+'</small><h2 class="big" style="font-size:26px">'+uc.title+'</h2></div></div>';
+    html+='<div class="uc-intro">'+uc.intro+'</div>';
+    html+='<div class="obsnote"><span>&#128065;</span><span>Observer mode — you’re viewing the clinic. Answering is disabled.</span></div>';
+    html+='<p style="font-size:13px;color:var(--ink-soft);margin:0 0 6px">This case study has <b>'+uc.concerns.length+' customer pain points</b>. Teams answer each with a <b>Product / platform</b> and a <b>Solution Engineer response</b>.</p>';
+    html+='<div id="ucConcerns">';
+    uc.concerns.forEach(function(c,idx){
+      html+='<div class="concern"><div class="concern-q"><div class="lb">Customer concern '+(idx+1)+'</div><p>'+c.text+'</p></div></div>';
+    });
+    html+='</div>';
+    html+='<div class="btn-row">';
+    if(S.currentUC>0) html+='<button class="btn ghost" id="ucPrev" type="button">&larr; Previous</button>';
+    if(S.currentUC<USECASES.length-1) html+='<button class="btn cyan" id="ucNext" type="button">Next case study &rarr;</button>';
+    else html+='<button class="btn ghost" id="ucBackScn" type="button">&larr; Back to scenario</button>';
+    html+='</div>';
+    $("#ucCard").innerHTML=html;
+    var prev=$("#ucPrev"); if(prev) prev.addEventListener("click",function(){ if(S.currentUC>0){S.currentUC--; renderUcBar(); renderUC();} });
+    var next=$("#ucNext"); if(next) next.addEventListener("click",function(){ if(S.currentUC<USECASES.length-1){S.currentUC++; renderUcBar(); renderUC();} });
+    var back=$("#ucBackScn"); if(back) back.addEventListener("click",function(){ show("scenario"); });
+  }
+
   function renderUC(){
+    if(S.observer){ renderUCObserver(); return; }
     var uc=USECASES[S.currentUC]; var submitted=!!S.submitted[uc.id]; var score=S.scores[uc.id];
     var html='';
     html+='<div class="uc-head"><div class="uc-no">'+(S.currentUC+1)+'</div><div class="t"><small>Case Study '+(S.currentUC+1)+' of 4 · '+uc.tag+'</small><h2 class="big" style="font-size:26px">'+uc.title+'</h2></div></div>';
